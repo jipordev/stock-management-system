@@ -40,6 +40,20 @@ public class MenuImpl implements Menu{
         Table table = new Table(1, BorderStyle.CLASSIC_COMPATIBLE_WIDE, ShownBorders.SURROUND);
         table.addCell("1.      Press       l : Display product as table");
         table.addCell("2.      Press       w : Create a new product");
+        table.addCell("3.      Press       r : View product details by code");
+        table.addCell("4       Press       e : Edit an existing product by code");
+        table.addCell("5.      Press       d : Delete an existing product by code");
+        table.addCell("6.      Press       s : Search an existing product by name");
+        table.addCell("7.      Press       c : Commit transaction data");
+        table.addCell("8.      Press       k : Backup data");
+        table.addCell("9.      Press       t : Restore data");
+        table.addCell("10.     Press       f : Navigate pagination to the last page");
+        table.addCell("11.     Press       p : Navigate pagination to the previous page");
+        table.addCell("12.     Press       n : Navigate pagination to the next page");
+        table.addCell("13.     Press       1 : Navigate pagination to the first page");
+        table.addCell("14.     Press       h : Help");
+        table.addCell("15.     Press       b : Step Back of the Application");
+
         System.out.println(table.render());
     }
 }
