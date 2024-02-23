@@ -14,11 +14,11 @@ public class ProductCRUDImpl implements ProductCRUD{
     public void searchProduct(List<Product> productList) {
         System.out.print("Enter product name");
         String proName = scanner.nextLine().toLowerCase();
-        productList.stream().forEach(product -> {
+        for (Product product : productList) {
             if (product.getProductName().contains(proName)){
 
             }
-        });
+        }
     }
 
     @Override
