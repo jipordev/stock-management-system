@@ -53,6 +53,7 @@ public class MenuImpl implements Menu{
         table.addCell("13.     Press       1 : Navigate pagination to the first page");
         table.addCell("14.     Press       h : Help");
         table.addCell("15.     Press       b : Step Back of the Application");
+        table.addCell("16.     Press       x : Exit the Application");
 
         System.out.println(table.render());
     }
