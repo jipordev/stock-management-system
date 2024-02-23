@@ -1,7 +1,11 @@
 <component name="libraryTable">
   <library name="text-table-formatter-1.1.2">
     <CLASSES>
+<<<<<<< HEAD
       <root url="jar://$USER_HOME$/Downloads/Telegram Desktop/text-table-formatter-1.1.2.jar!/" />
+=======
+      <root url="jar://$PROJECT_DIR$/text-table-formatter-1.1.2.jar!/" />
+>>>>>>> 0e53ba668648c1646c19ed1a842d9df703045443
     </CLASSES>
     <JAVADOC />
     <SOURCES />
