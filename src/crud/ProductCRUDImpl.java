@@ -9,6 +9,18 @@ import java.util.Scanner;
 
 public class ProductCRUDImpl implements ProductCRUD{
     static Scanner scanner = new Scanner(System.in);
+
+    @Override
+    public void searchProduct(List<Product> productList) {
+        System.out.print("Enter product name");
+        String proName = scanner.nextLine().toLowerCase();
+        for (Product product : productList) {
+            if (product.getProductName().contains(proName)){
+
+            }
+        }
+    }
+
     @Override
     public void createProduct(Product product) {
         System.out.print("Enter product name : ");
