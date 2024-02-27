@@ -26,8 +26,6 @@ public class MainApplication {
     static List<Product> productList = new ArrayList<>();
 
     public static void main(String[] args) {
-        int pageNumber = 1;
-        int pageSize = pagination.setNewRow();
 
         List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
         List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
@@ -35,6 +33,8 @@ public class MainApplication {
         productList.addAll(transferProducts);
 
         do {
+            int pageNumber = 1;
+            int pageSize = pagination.setNewRow();
             menu.displayBanner();
             menu.displayMainMenu();
             out.print("Choose an option: ");
@@ -47,7 +47,7 @@ public class MainApplication {
                 case "e" -> productService.updateProduct(productList);
                 case "d" -> productService.deleteProduct(productList);
                 case "s" -> productService.searchProductByName();
-                case "o" -> pagination.setNewRow();
+                case "o" -> pagination.setPageSize(scanner);
                 case "c" -> {
                     //
                 }
