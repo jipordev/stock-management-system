@@ -53,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
         product.setDate(LocalDate.now());
         product.setStatus("new");
         productList.add(product);
-        fileMethods.writeToFile(productList, TRANSFER_FILE);
+        fileMethods.writeTransferRecord(product, TRANSFER_FILE);
 
         System.out.println("New product created successfully.");
     }
@@ -98,7 +98,6 @@ public class ProductServiceImpl implements ProductService {
             if (scanner.nextLine().equalsIgnoreCase("y")){
                 productList.remove(productToDelete);
                 // Write the updated product list back to the data source file
-                fileMethods.writeToFile(productList, DATA_SOURCE_FILE);
                 System.out.println("#################");
                 System.out.println("Product deleted successfully.");
             } else {
@@ -178,7 +177,7 @@ public class ProductServiceImpl implements ProductService {
                         updateProduct.setStatus("update");
                         updateProduct.setProductCode(product.getProductCode());
                         productList.set(productList.indexOf(product), updateProduct);
-                        fileMethods.writeToFile(productList,TRANSFER_FILE);
+                        fileMethods.writeTransferRecord(updateProduct,TRANSFER_FILE);
                     }
                 }
             }
