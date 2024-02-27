@@ -141,7 +141,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void updateProduct(List<Product> productList) {
-        productList = fileMethods.readProductsFromFile(TRANSFER_FILE);
         Product updateProduct = new Product();
         System.out.println("""
                 1. Update all
