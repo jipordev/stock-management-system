@@ -31,7 +31,7 @@ public class MenuImpl implements Menu{
         Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND);
         table.addCell("             Disp(l)ay | Rando(m) | (W)rite | (R)ead | (E)dit | (D)elete | (S)earch              ",cellStyle);
         table.addCell("             Set R(o)w | (C)ommit | Bac(k) up | Res(t)ore | (H)elp | E(x)it              ",cellStyle);
-        System.out.println(table.render());;
+        System.out.println(table.render());
     }
 
     @Override
