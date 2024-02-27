@@ -34,6 +34,7 @@ public class MenuImpl implements Menu{
         System.out.println(table.render());;
     }
 
+
     @Override
     public void displayHelp() {
         System.out.println("# Help Instruction");
