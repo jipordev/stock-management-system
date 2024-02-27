@@ -56,6 +56,7 @@ public class FileMethodsImpl implements FileMethods{
                         p.getQty() + "," +
                         p.getDate().toString() + "," +
                         p.getStatus());
+                writer.flush();
                 writer.newLine();
             }
             System.out.println("Data written to file successfully.");
@@ -82,6 +83,7 @@ public class FileMethodsImpl implements FileMethods{
                     product.getQty() + "," +
                     product.getDate() + "," +
                     product.getStatus());
+            writer.flush();
             writer.newLine();
             System.out.println("Transfer record written successfully.");
         } catch (IOException e) {
