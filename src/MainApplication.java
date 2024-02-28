@@ -45,7 +45,11 @@ public class MainApplication {
                 case "d" -> productService.deleteProduct(productList);
                 case "s" -> productService.searchProductByName();
                 case "o" -> pagination.setPageSize(scanner);
-                case "c" -> fileMethods.displayCommit(transferProducts);
+                case "c" -> {
+                    fileMethods.displayCommit(transferProducts);
+                    fileMethods.checkFileForCommit(productList);
+                    fileMethods.clearFileTransfer(TRANSFER_FILE);
+                }
                 case "k" -> {
                     String backupFilePath = fileMethods.backupFileDir();
                     System.out.print("Are you sure to Backup [Y/N]: ");

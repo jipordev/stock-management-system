@@ -2,6 +2,7 @@ package filemethods;
 
 import model.Product;
 import org.nocrala.tools.texttablefmt.BorderStyle;
+import org.nocrala.tools.texttablefmt.CellStyle;
 import org.nocrala.tools.texttablefmt.ShownBorders;
 import org.nocrala.tools.texttablefmt.Table;
 
@@ -148,7 +149,6 @@ public class FileMethodsImpl implements FileMethods{
             if (!restoreDir.exists()) {
                 restoreDir.mkdirs();
             }
-
             // Construct the path for the restored file
             String restoredFilePath = restoreDirectory + selectedBackupFile.getName();
 
@@ -163,7 +163,6 @@ public class FileMethodsImpl implements FileMethods{
             System.out.println("Invalid file number selected.");
         }
     }
-
     @Override
     public void listingBackupFiles() {
         String backUpDirectory = "backup/";
@@ -215,7 +214,7 @@ public class FileMethodsImpl implements FileMethods{
                     clearFileTransfer("transproduct.bak");
                 }
             }else{
-                System.out.println("Clear!");
+                clearFileTransfer("transproduct.bak");
             }
         } else {
             System.out.println("Nothing to commit!!");
@@ -224,14 +223,25 @@ public class FileMethodsImpl implements FileMethods{
     @Override
     public void displayCommit(List<Product> transferProduct) {
         transferProduct = readProductsFromFile("transproduct.bak");
-        for(Product productTransfer : transferProduct){
-            System.out.print(productTransfer.getProductCode()+",");
-            System.out.print(productTransfer.getProductName()+",");
-            System.out.print(productTransfer.getQty()+",");
-            System.out.print(productTransfer.getProductPrice()+",");
-            System.out.print(productTransfer.getDate()+",");
-            System.out.print(productTransfer.getStatus());
-            System.out.println();
+        Table table = new Table(6, BorderStyle.UNICODE_BOX_DOUBLE_BORDER_WIDE, ShownBorders.ALL);
+        Table title = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER_WIDE, ShownBorders.ALL);
+        CellStyle cellStyle = new CellStyle(CellStyle.HorizontalAlign.center);
+        title.addCell("====================================[ RECORD COMMIT ]====================================", cellStyle);
+        System.out.println(title.render());
+        table.addCell("PRODUCT CODE", cellStyle);
+        table.addCell("PRODUCT NAME", cellStyle);
+        table.addCell("PRODUCT QTY", cellStyle);
+        table.addCell("PRODUCT PRICE", cellStyle);
+        table.addCell("PRODUCT DATE", cellStyle);
+        table.addCell("PRODUCT STATUS", cellStyle);
+        for(Product productTransfer : transferProduct) {
+            table.addCell(productTransfer.getProductCode(), cellStyle);
+            table.addCell(productTransfer.getProductName(), cellStyle);
+            table.addCell(String.valueOf(productTransfer.getQty()), cellStyle);
+            table.addCell(String.valueOf(productTransfer.getProductPrice()), cellStyle);
+            table.addCell(String.valueOf(productTransfer.getDate()), cellStyle);
+            table.addCell(productTransfer.getStatus(), cellStyle);
+            System.out.println(table.render());
         }
     }
     @Override
@@ -243,5 +253,4 @@ public class FileMethodsImpl implements FileMethods{
             System.out.println("Transfer File Not Found!" + e.getMessage());
         }
     }
-
 }
