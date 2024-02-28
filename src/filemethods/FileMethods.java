@@ -6,7 +6,6 @@ import java.util.List;
 
 public interface FileMethods {
     List<Product> readProductsFromFile(String fileName);
-
     void writeToFile(List<Product> productList, String fileName);
     String  backupFileDir();
     void writeTransferRecord(Product product, String transferFileName);
@@ -14,4 +13,7 @@ public interface FileMethods {
     void backUpData(String sourceFilePath, String backupFilePath);
     void restoreData();
     void listingBackupFiles();
+    void checkFileForCommit(List<Product> productList);
+    void clearFileTransfer(String TRANSFER_FILE);
+    void displayCommit(List<Product> transferProduct);
 }

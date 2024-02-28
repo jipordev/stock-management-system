@@ -14,10 +14,8 @@ import java.util.Scanner;
 import static java.lang.System.*;
 
 public class MainApplication {
-
     private static final String DATA_SOURCE_FILE = "product.bak";
     private static final String TRANSFER_FILE = "transproduct.bak";
-
     static Scanner scanner = new Scanner(in);
     static MenuImpl menu = new MenuImpl();
     static Pagination pagination = new PaginationImpl();
@@ -26,12 +24,11 @@ public class MainApplication {
     static List<Product> productList = new ArrayList<>();
 
     public static void main(String[] args) {
-
-        List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
         List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
+        List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
         productList.addAll(dataSourceProducts);
         productList.addAll(transferProducts);
-
+        fileMethods.checkFileForCommit(productList);
         do {
             int pageNumber = 1;
             int pageSize = pagination.setNewRow();
@@ -48,9 +45,7 @@ public class MainApplication {
                 case "d" -> productService.deleteProduct(productList);
                 case "s" -> productService.searchProductByName();
                 case "o" -> pagination.setPageSize(scanner);
-                case "c" -> {
-                    //
-                }
+                case "c" -> fileMethods.displayCommit(transferProducts);
                 case "k" -> {
                     String backupFilePath = fileMethods.backupFileDir();
                     System.out.print("Are you sure to Backup [Y/N]: ");
@@ -62,6 +57,8 @@ public class MainApplication {
                 case "t" -> fileMethods.restoreData();
                 case "h" -> menu.displayHelp();
                 case "x" -> {
+                    transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
+                    fileMethods.checkFileForCommit(productList);
                     System.exit(0);
                 }
             }

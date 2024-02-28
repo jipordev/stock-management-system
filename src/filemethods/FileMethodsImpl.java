@@ -19,6 +19,7 @@ import java.util.Scanner;
 
 public class FileMethodsImpl implements FileMethods{
     static Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND);
+    static Scanner scanner = new Scanner(System.in);
 
     @Override
     public List<Product> readProductsFromFile(String fileName) {
@@ -48,7 +49,7 @@ public class FileMethodsImpl implements FileMethods{
 
     @Override
     public void writeToFile(List<Product> productList, String fileName) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName,true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for (Product p : productList) {
                 writer.write(p.getProductCode() + "," +
                         p.getProductName() + "," +
@@ -182,4 +183,65 @@ public class FileMethodsImpl implements FileMethods{
             System.out.println("Backup directory is not exist or is not a directory");
         }
     }
+    @Override
+    public void checkFileForCommit(List<Product> productList){
+        List<Product> transferProducts = readProductsFromFile("transproduct.bak");
+        if(!(transferProducts.isEmpty())){
+            System.out.print("You need to commit first! [Y/N]: ");
+            String ops = scanner.next();
+            if(ops.equalsIgnoreCase("y")){
+                List<Product> productAfterUpdate = new ArrayList<>();
+                for(Product oldProduct : productList){
+                    for(Product newProduct : transferProducts){
+                        if(newProduct.getProductCode().equals(oldProduct.getProductCode())){
+                            oldProduct.setProductCode(newProduct.getProductCode());
+                            oldProduct.setProductName(newProduct.getProductName());
+                            oldProduct.setProductPrice(newProduct.getProductPrice());
+                            oldProduct.setQty(newProduct.getQty());
+                            oldProduct.setDate(newProduct.getDate());
+                            oldProduct.setStatus(newProduct.getStatus());
+                        }
+                        else{
+                            oldProduct.setProductCode(oldProduct.getProductCode());
+                            oldProduct.setProductName(oldProduct.getProductName());
+                            oldProduct.setProductPrice(oldProduct.getProductPrice());
+                            oldProduct.setQty(oldProduct.getQty());
+                            oldProduct.setDate(oldProduct.getDate());
+                            oldProduct.setStatus(oldProduct.getStatus());
+                        }
+                    }
+                    productAfterUpdate.add(oldProduct);
+                    writeToFile(productAfterUpdate,"product.bak");
+                    clearFileTransfer("transproduct.bak");
+                }
+            }else{
+                System.out.println("Clear!");
+            }
+        } else {
+            System.out.println("Nothing to commit!!");
+        }
+    }
+    @Override
+    public void displayCommit(List<Product> transferProduct) {
+        transferProduct = readProductsFromFile("transproduct.bak");
+        for(Product productTransfer : transferProduct){
+            System.out.print(productTransfer.getProductCode()+",");
+            System.out.print(productTransfer.getProductName()+",");
+            System.out.print(productTransfer.getQty()+",");
+            System.out.print(productTransfer.getProductPrice()+",");
+            System.out.print(productTransfer.getDate()+",");
+            System.out.print(productTransfer.getStatus());
+            System.out.println();
+        }
+    }
+    @Override
+    public void clearFileTransfer(String TRANSFER_FILE) {
+        readProductsFromFile(TRANSFER_FILE);
+        try(BufferedWriter writeToClear = new BufferedWriter(new FileWriter(TRANSFER_FILE))){
+            writeToClear.write("");
+        }catch (IOException e){
+            System.out.println("Transfer File Not Found!" + e.getMessage());
+        }
+    }
+
 }
