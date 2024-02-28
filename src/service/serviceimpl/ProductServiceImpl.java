@@ -200,7 +200,7 @@ public class ProductServiceImpl implements ProductService {
                         updateProduct.setProductPrice(product.getProductPrice());
                         updateProduct.setQty(product.getQty());
                         updateProduct.setDate(product.getDate());
-                        updateProduct.setStatus(product.getStatus());
+                        updateProduct.setStatus("update");
                         productList.set(productList.indexOf(product), updateProduct);
                         fileMethods.writeTransferRecord(updateProduct, TRANSFER_FILE);
                     }
@@ -225,7 +225,7 @@ public class ProductServiceImpl implements ProductService {
                         updateProduct.setProductCode(product.getProductCode());
                         updateProduct.setQty(product.getQty());
                         updateProduct.setDate(product.getDate());
-                        updateProduct.setStatus(product.getStatus());
+                        updateProduct.setStatus("update");
                         productList.set(productList.indexOf(product), updateProduct);
                         fileMethods.writeTransferRecord(updateProduct, TRANSFER_FILE);
                     }
@@ -250,7 +250,7 @@ public class ProductServiceImpl implements ProductService {
                         updateProduct.setProductName(product.getProductName());
                         updateProduct.setProductCode(product.getProductCode());
                         updateProduct.setDate(product.getDate());
-                        updateProduct.setStatus(product.getStatus());
+                        updateProduct.setStatus("update");
                         productList.set(productList.indexOf(product), updateProduct);
                         fileMethods.writeTransferRecord(updateProduct, TRANSFER_FILE);
                     }
