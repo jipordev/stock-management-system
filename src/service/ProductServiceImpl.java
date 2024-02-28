@@ -53,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
         product.setDate(LocalDate.now());
         product.setStatus("new");
         productList.add(product);
-        fileMethods.writeTransferRecord(product, TRANSFER_FILE);
+        fileMethods.writeTransferRecord(product,TRANSFER_FILE);
 
         System.out.println("New product created successfully.");
     }
@@ -97,7 +97,6 @@ public class ProductServiceImpl implements ProductService {
             System.out.print("Are you sure to delete (Y/N): ");
             if (scanner.nextLine().equalsIgnoreCase("y")){
                 productList.remove(productToDelete);
-                // Write the updated product list back to the data source file
                 System.out.println("#################");
                 System.out.println("Product deleted successfully.");
             } else {
@@ -142,7 +141,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void updateProduct(List<Product> productList) {
-        productList = fileMethods.readProductsFromFile(TRANSFER_FILE);
         Product updateProduct = new Product();
         System.out.println("""
                 1. Update all
@@ -154,18 +152,17 @@ public class ProductServiceImpl implements ProductService {
         int op = Integer.parseInt(scanner.nextLine());
         switch (op) {
             case 1 -> {
-                Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND);
                 System.out.print("Enter product code : ");
                 String code = scanner.nextLine();
                 for (Product product : productList) {
                     if (product.getProductCode().equals(code)) {
-                        table.addCell("Product code: "+product.getProductCode());
-                        table.addCell("Product name: "+product.getProductName());
-                        table.addCell("Product price: "+product.getProductPrice());
-                        table.addCell("Product quantity: "+product.getQty());
-                        table.addCell("Product date: "+product.getDate());
-                        table.addCell("Product status: "+product.getStatus());
-                        System.out.println(table.render());
+                        tableUpdate.addCell("Product code: "+product.getProductCode());
+                        tableUpdate.addCell("Product name: "+product.getProductName());
+                        tableUpdate.addCell("Product price: "+product.getProductPrice());
+                        tableUpdate.addCell("Product quantity: "+product.getQty());
+                        tableUpdate.addCell("Product date: "+product.getDate());
+                        tableUpdate.addCell("Product status: "+product.getStatus());
+                        System.out.println(tableUpdate.render());
 
                         System.out.print("Enter new NAME : ");
                         updateProduct.setProductName(scanner.nextLine());
@@ -181,6 +178,82 @@ public class ProductServiceImpl implements ProductService {
                     }
                 }
             }
+            case 2 -> {
+                System.out.print("Enter product code: ");
+                String proCode = scanner.nextLine();
+                for (Product product : productList){
+                    if (product.getProductCode().equals(proCode)){
+                        tableUpdate.addCell("Product code: "+product.getProductCode());
+                        tableUpdate.addCell("Product name: "+product.getProductName());
+                        tableUpdate.addCell("Product price: "+product.getProductPrice());
+                        tableUpdate.addCell("Product quantity: "+product.getQty());
+                        tableUpdate.addCell("Product date: "+product.getDate());
+                        tableUpdate.addCell("Product status: "+product.getStatus());
+                        System.out.println(tableUpdate.render());
+
+                        System.out.print("Enter new product name: ");
+                        updateProduct.setProductName(scanner.nextLine());
+                        updateProduct.setProductCode(product.getProductCode());
+                        updateProduct.setProductPrice(product.getProductPrice());
+                        updateProduct.setQty(product.getQty());
+                        updateProduct.setDate(product.getDate());
+                        updateProduct.setStatus(product.getStatus());
+                        productList.set(productList.indexOf(product), updateProduct);
+                        fileMethods.writeTransferRecord(updateProduct, TRANSFER_FILE);
+                    }
+                }
+            }
+            case 3 -> {
+                System.out.print("Enter product code: ");
+                String proCode = scanner.nextLine();
+                for (Product product : productList){
+                    if (product.getProductCode().equals(proCode)){
+                        tableUpdate.addCell("Product code: "+product.getProductCode());
+                        tableUpdate.addCell("Product name: "+product.getProductName());
+                        tableUpdate.addCell("Product price: "+product.getProductPrice());
+                        tableUpdate.addCell("Product quantity: "+product.getQty());
+                        tableUpdate.addCell("Product date: "+product.getDate());
+                        tableUpdate.addCell("Product status: "+product.getStatus());
+                        System.out.println(tableUpdate.render());
+
+                        System.out.print("Enter new product price: ");
+                        updateProduct.setProductPrice(Double.parseDouble(scanner.nextLine()));
+                        updateProduct.setProductName(product.getProductName());
+                        updateProduct.setProductCode(product.getProductCode());
+                        updateProduct.setQty(product.getQty());
+                        updateProduct.setDate(product.getDate());
+                        updateProduct.setStatus(product.getStatus());
+                        productList.set(productList.indexOf(product), updateProduct);
+                        fileMethods.writeTransferRecord(updateProduct, TRANSFER_FILE);
+                    }
+                }
+            }
+            case 4 -> {
+                System.out.print("Enter product code: ");
+                String proCode = scanner.nextLine();
+                for (Product product : productList){
+                    if (product.getProductCode().equals(proCode)){
+                        tableUpdate.addCell("Product code: "+product.getProductCode());
+                        tableUpdate.addCell("Product name: "+product.getProductName());
+                        tableUpdate.addCell("Product price: "+product.getProductPrice());
+                        tableUpdate.addCell("Product quantity: "+product.getQty());
+                        tableUpdate.addCell("Product date: "+product.getDate());
+                        tableUpdate.addCell("Product status: "+product.getStatus());
+                        System.out.println(tableUpdate.render());
+
+                        System.out.print("Enter new product qty: ");
+                        updateProduct.setQty(Integer.parseInt(scanner.nextLine()));
+                        updateProduct.setProductPrice(product.getProductPrice());
+                        updateProduct.setProductName(product.getProductName());
+                        updateProduct.setProductCode(product.getProductCode());
+                        updateProduct.setDate(product.getDate());
+                        updateProduct.setStatus(product.getStatus());
+                        productList.set(productList.indexOf(product), updateProduct);
+                        fileMethods.writeTransferRecord(updateProduct, TRANSFER_FILE);
+                    }
+                }
+            }
+            default -> System.out.println("Invalid update option");
         }
     }
     @Override
