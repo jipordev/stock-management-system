@@ -8,7 +8,7 @@ import org.nocrala.tools.texttablefmt.Table;
 public class MenuImpl implements Menu{
     @Override
     public void displayBanner() {
-        System.out.println("""
+        System.out.println(""" 
                 ###################################
                 WELCOME TO 
                 STOCK MANAGEMENT SYSTEM

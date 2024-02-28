@@ -10,8 +10,11 @@ import org.nocrala.tools.texttablefmt.Table;
 import util.Pagination;
 import util.PaginationImpl;
 
+import java.io.*;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProductServiceImpl implements ProductService {
     static Scanner scanner = new Scanner(System.in);
@@ -20,23 +23,66 @@ public class ProductServiceImpl implements ProductService {
     public static FileMethods fileMethods = new FileMethodsImpl();
     public static Pagination pagination = new PaginationImpl();
 
+
+    public static Duration timeOperation(Runnable operation) {
+        long startTime = System.nanoTime();
+        operation.run();
+        long endTime = System.nanoTime();
+        return Duration.ofNanos(endTime - startTime);
+    }
+
+    public void loadDataUntilReady(AtomicBoolean isDataReady) {
+        final String[] animation = {"|", "/", "-", "\\"};
+        Thread startLoading = new Thread(() -> {
+            try {
+                int i = 0;
+                while (!isDataReady.get()) {
+                    System.out.print("\rLoading data " + animation[i % animation.length]);
+                    Thread.sleep(100);
+                    i++;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        startLoading.start();
+    }
+
     @Override
     public void randomRecord(List<Product> productList) {
-        System.out.print("Enter amount of record : ");
+        System.out.print(">Enter amount of record : ");
         int randomNumber = Integer.parseInt(scanner.nextLine());
         Product[] products = new Product[randomNumber];
-        for (int i = 0; i<randomNumber; i++) {
-            products[i] = new Product();
-            products[i].setProductCode("CSTAD"+ i);
-            products[i].setProductName("Product::"+i);
-            products[i].setProductPrice(0.0);
-            products[i].setQty(0);
-            products[i].setDate(LocalDate.now());
-            products[i].setStatus("null");
+        System.out.println("Are you sure want to random " + randomNumber + " Products?[Y/n]: ");
+        String ch = new Scanner(System.in).nextLine();
+        //loading is starting
+        if (ch.equalsIgnoreCase("y")) {
+            AtomicBoolean isDataReady = new AtomicBoolean(false);
+            loadDataUntilReady(isDataReady);
+            try {
+                Thread.sleep(100);
+                // random time is start
+                Duration randomTime = timeOperation(() -> {
+                    for (int i = 0; i < randomNumber; i++) {
+                        products[i] = new Product();
+                        products[i].setProductCode("CSTAD00" + i);
+                        products[i].setProductName("Product::" + i);
+                        products[i].setProductPrice(0.0);
+                        products[i].setQty(0);
+                        products[i].setDate(LocalDate.now());
+                        products[i].setStatus("null");
+                    }
+                    productList.addAll(List.of(products));
+                    fileMethods.writeToFile(productList, DATA_SOURCE_FILE);
+                    System.out.println("Random is completed!!");
+                    // loading is ready(random time is end )
+                    isDataReady.set(true);
+                });
+                System.out.println("Write " + randomNumber + " Products Speed : " + randomTime.toSeconds() + " s");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        productList.addAll(List.of(products));
-
-        fileMethods.writeToFile(productList,DATA_SOURCE_FILE);
     }
 
     @Override
@@ -53,14 +99,14 @@ public class ProductServiceImpl implements ProductService {
         product.setDate(LocalDate.now());
         product.setStatus("new");
         productList.add(product);
-        fileMethods.writeTransferRecord(product,TRANSFER_FILE);
+        fileMethods.writeTransferRecord(product, TRANSFER_FILE);
 
         System.out.println("New product created successfully.");
     }
 
     @Override
     public void deleteProduct(List<Product> productList) {
-        Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER,ShownBorders.SURROUND);
+        Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND);
         // Read products from the data source file
         productList = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
 
@@ -86,16 +132,16 @@ public class ProductServiceImpl implements ProductService {
             );
             fileMethods.writeTransferRecord(transferProduct, TRANSFER_FILE);
 
-            table.addCell("Product code: "+productToDelete.getProductCode());
-            table.addCell("Product name: "+productToDelete.getProductName());
-            table.addCell("Product price: "+productToDelete.getProductPrice());
-            table.addCell("Product quantity: "+productToDelete.getQty());
-            table.addCell("Product date: "+productToDelete.getDate());
-            table.addCell("Product status: "+productToDelete.getStatus());
+            table.addCell("Product code: " + productToDelete.getProductCode());
+            table.addCell("Product name: " + productToDelete.getProductName());
+            table.addCell("Product price: " + productToDelete.getProductPrice());
+            table.addCell("Product quantity: " + productToDelete.getQty());
+            table.addCell("Product date: " + productToDelete.getDate());
+            table.addCell("Product status: " + productToDelete.getStatus());
             System.out.println(table.render());
             // Remove the product from the original file
             System.out.print("Are you sure to delete (Y/N): ");
-            if (scanner.nextLine().equalsIgnoreCase("y")){
+            if (scanner.nextLine().equalsIgnoreCase("y")) {
                 productList.remove(productToDelete);
                 System.out.println("#################");
                 System.out.println("Product deleted successfully.");
@@ -157,12 +203,12 @@ public class ProductServiceImpl implements ProductService {
                 String code = scanner.nextLine();
                 for (Product product : productList) {
                     if (product.getProductCode().equals(code)) {
-                        table.addCell("Product code: "+product.getProductCode());
-                        table.addCell("Product name: "+product.getProductName());
-                        table.addCell("Product price: "+product.getProductPrice());
-                        table.addCell("Product quantity: "+product.getQty());
-                        table.addCell("Product date: "+product.getDate());
-                        table.addCell("Product status: "+product.getStatus());
+                        table.addCell("Product code: " + product.getProductCode());
+                        table.addCell("Product name: " + product.getProductName());
+                        table.addCell("Product price: " + product.getProductPrice());
+                        table.addCell("Product quantity: " + product.getQty());
+                        table.addCell("Product date: " + product.getDate());
+                        table.addCell("Product status: " + product.getStatus());
                         System.out.println(table.render());
 
                         System.out.print("Enter new NAME : ");
@@ -175,12 +221,13 @@ public class ProductServiceImpl implements ProductService {
                         updateProduct.setStatus("update");
                         updateProduct.setProductCode(product.getProductCode());
                         productList.set(productList.indexOf(product), updateProduct);
-                        fileMethods.writeTransferRecord(updateProduct,TRANSFER_FILE);
+                        fileMethods.writeTransferRecord(updateProduct, TRANSFER_FILE);
                     }
                 }
             }
         }
     }
+
     @Override
     public void displayAllProduct(List<Product> productList, int pageNumber, int pageSize) {
         boolean isTrue;
@@ -246,6 +293,7 @@ public class ProductServiceImpl implements ProductService {
             }
         } while (isTrue);
     }
+
     @Override
     public void searchProductByName() {
         List<Product> searchProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
@@ -266,5 +314,23 @@ public class ProductServiceImpl implements ProductService {
             System.out.println("No products found matching the search criteria.");
         }
     }
+
+
+//    public void loadingInMain() {
+//        AtomicBoolean isReady = new AtomicBoolean(false);
+//        loadDataUntilReady(isReady);
+//            Duration readFile = timeOperation(()->{
+//            try {
+//                BufferedReader bufferedReader = new BufferedReader(new FileReader("product.bak"));
+////                Thread.sleep(5000);
+//            } catch (Exception e) {
+//                System.out.println(e.getMessage());
+//            }
+//            });
+//            System.out.println("\n Completed! "+readFile.toSeconds()+"s");
+//        isReady.set(true);
+//    }
 }
+
+
 
