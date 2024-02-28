@@ -1,4 +1,4 @@
-package filemethods;
+package service;
 
 import model.Product;
 
@@ -14,4 +14,5 @@ public interface FileMethods {
     void backUpData(String sourceFilePath, String backupFilePath);
     void restoreData();
     void listingBackupFiles();
+    void commit(List<Product> productList,String dataSourceFile, String transferFile);
 }

@@ -1,9 +1,10 @@
-package filemethods;
+package service.serviceimpl;
 
 import model.Product;
 import org.nocrala.tools.texttablefmt.BorderStyle;
 import org.nocrala.tools.texttablefmt.ShownBorders;
 import org.nocrala.tools.texttablefmt.Table;
+import service.FileMethods;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -16,9 +17,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
-public class FileMethodsImpl implements FileMethods{
+public class FileMethodsImpl implements FileMethods {
     static Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND);
+    static Scanner scanner = new Scanner(System.in);
 
     @Override
     public List<Product> readProductsFromFile(String fileName) {
@@ -73,6 +76,7 @@ public class FileMethodsImpl implements FileMethods{
         String  backupFileName = "backupfile_" + timestamp + ".bak";
         return backupDirectory + backupFileName;
     }
+
     @Override
     public void writeTransferRecord(Product product, String transferFileName) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(transferFileName, true))) {
@@ -100,6 +104,7 @@ public class FileMethodsImpl implements FileMethods{
             return false;
         }
     }
+
     @Override
     public void backUpData(String sourceFilePath, String backupFilePath) {
         try {
@@ -127,6 +132,7 @@ public class FileMethodsImpl implements FileMethods{
             System.out.println(e.getMessage());
         }
     }
+
     @Override
     public void restoreData() {
         listingBackupFiles();
@@ -170,16 +176,52 @@ public class FileMethodsImpl implements FileMethods{
         if (backupDir.exists() && backupDir.isDirectory()){
             File[] files = backupDir.listFiles();
             if (files != null && files.length >0) {
+                Table table1 = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND); // Initialize table here
                 System.out.println("Back up files: ");
                 for (int i = 0; i<files.length; i++){
-                    table.addCell("   "+(i+1)+". "+files[i].getName()+"   ");
+                    table1.addCell("   "+(i+1)+". "+files[i].getName()+"   ");
                 }
-                System.out.println(table.render());
+                System.out.println(table1.render());
             } else {
-                System.out.println("There is no backup files found");
+                System.out.println("There are no backup files found");
             }
         } else {
-            System.out.println("Backup directory is not exist or is not a directory");
+            System.out.println("Backup directory does not exist or is not a directory");
+        }
+    }
+
+    @Override
+    public void commit(List<Product> productList ,String dataSourceFile, String transferFile) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(transferFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(dataSourceFile, true));
+             FileWriter truncateWriter = new FileWriter(transferFile, false)) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                String status = parts[parts.length - 1].trim(); // assuming status is the last field
+
+                switch (status) {
+                    case "new" -> {
+                        String updatedLine = line.substring(0, line.lastIndexOf(',')) + ",null";
+                        // Write the updated line to the transfer file (temporarily)
+                        writer.write(updatedLine);
+                        writer.newLine();
+                    }
+                    case "delete" -> {
+                        String productCodeToDelete = parts[0].trim();
+                        productList.removeIf(product -> product.getProductCode().equals(productCodeToDelete));
+                    }
+                    case "update" -> {
+
+                    }
+                }
+            }
+            // Commit is done, now truncate the transfer file
+            truncateWriter.write(""); // This will clear the content of the file
+        } catch (IOException e) {
+            // Handle IO exceptions
+            System.out.println(e.getMessage());
         }
     }
 }

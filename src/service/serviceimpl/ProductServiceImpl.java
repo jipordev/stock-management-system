@@ -1,12 +1,14 @@
-package service;
+package service.serviceimpl;
 
-import filemethods.FileMethods;
-import filemethods.FileMethodsImpl;
+import service.FileMethods;
+import service.serviceimpl.FileMethodsImpl;
 import model.Product;
 import org.nocrala.tools.texttablefmt.BorderStyle;
 import org.nocrala.tools.texttablefmt.CellStyle;
 import org.nocrala.tools.texttablefmt.ShownBorders;
 import org.nocrala.tools.texttablefmt.Table;
+import service.FileMethods;
+import service.ProductService;
 import util.Pagination;
 import util.PaginationImpl;
 
@@ -141,6 +143,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void updateProduct(List<Product> productList) {
+        Table tableUpdate = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND);
         Product updateProduct = new Product();
         System.out.println("""
                 1. Update all
