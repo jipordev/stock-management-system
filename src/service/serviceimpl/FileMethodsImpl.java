@@ -7,9 +7,7 @@ import org.nocrala.tools.texttablefmt.Table;
 import service.FileMethods;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -187,41 +185,6 @@ public class FileMethodsImpl implements FileMethods {
             }
         } else {
             System.out.println("Backup directory does not exist or is not a directory");
-        }
-    }
-
-    @Override
-    public void commit(List<Product> productList ,String dataSourceFile, String transferFile) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(transferFile));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(dataSourceFile, true));
-             FileWriter truncateWriter = new FileWriter(transferFile, false)) {
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                String status = parts[parts.length - 1].trim(); // assuming status is the last field
-
-                switch (status) {
-                    case "new" -> {
-                        String updatedLine = line.substring(0, line.lastIndexOf(',')) + ",null";
-                        // Write the updated line to the transfer file (temporarily)
-                        writer.write(updatedLine);
-                        writer.newLine();
-                    }
-                    case "delete" -> {
-                        String productCodeToDelete = parts[0].trim();
-                        productList.removeIf(product -> product.getProductCode().equals(productCodeToDelete));
-                    }
-                    case "update" -> {
-
-                    }
-                }
-            }
-            // Commit is done, now truncate the transfer file
-            truncateWriter.write(""); // This will clear the content of the file
-        } catch (IOException e) {
-            // Handle IO exceptions
-            System.out.println(e.getMessage());
         }
     }
 }

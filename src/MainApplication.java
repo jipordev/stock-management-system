@@ -1,8 +1,8 @@
-import filemethods.FileMethods;
-import filemethods.FileMethodsImpl;
+import service.FileMethods;
+import service.serviceimpl.FileMethodsImpl;
 import model.Product;
 import service.ProductService;
-import service.ProductServiceImpl;
+import service.serviceimpl.ProductServiceImpl;
 import util.Pagination;
 import util.PaginationImpl;
 import view.MenuImpl;
@@ -69,6 +69,8 @@ public class MainApplication {
         isReady.set(true);
 
         do {
+            int pageNumber = 1;
+            int pageSize = pagination.setNewRow();
             menu.displayBanner();
             menu.displayMainMenu();
             out.print("Choose an option: ");
@@ -82,7 +84,9 @@ public class MainApplication {
                 case "d" -> productService.deleteProduct(productList);
                 case "s" -> productService.searchProductByName();
                 case "o" -> pagination.setPageSize(scanner);
-                case "c" -> fileMethods.commit(productList,DATA_SOURCE_FILE, TRANSFER_FILE);
+                case "c" -> {
+                    //
+                }
                 case "k" -> {
                     String backupFilePath = fileMethods.backupFileDir();
                     System.out.print("Are you sure to Backup [Y/N]: ");

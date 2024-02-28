@@ -1,7 +1,5 @@
 package service.serviceimpl;
 
-import service.FileMethods;
-import service.serviceimpl.FileMethodsImpl;
 import model.Product;
 import org.nocrala.tools.texttablefmt.BorderStyle;
 import org.nocrala.tools.texttablefmt.CellStyle;
@@ -13,17 +11,24 @@ import util.Pagination;
 import util.PaginationImpl;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProductServiceImpl implements ProductService {
-    static Scanner scanner = new Scanner(System.in);
+    private static final String FILE_DIRECTORY = "files/";
     private static final String DATA_SOURCE_FILE = "product.bak";
     private static final String TRANSFER_FILE = "transproduct.bak";
-    public static FileMethods fileMethods = new FileMethodsImpl();
-    public static Pagination pagination = new PaginationImpl();
+
+    private final Path DATA_SOURCE_FILE_PATH = Paths.get(FILE_DIRECTORY, DATA_SOURCE_FILE);
+    private final Path TRANSFER_FILE_PATH = Paths.get(FILE_DIRECTORY, TRANSFER_FILE);
+
+    private final FileMethods fileMethods = new FileMethodsImpl();
+    private final Pagination pagination = new PaginationImpl();
+    private final Scanner scanner = new Scanner(System.in);
 
 
     public static Duration timeOperation(Runnable operation) {
