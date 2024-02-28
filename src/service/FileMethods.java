@@ -1,8 +1,9 @@
-package service;
+package filemethods;
 
 import model.Product;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface FileMethods {
     List<Product> readProductsFromFile(String fileName);
@@ -14,5 +15,5 @@ public interface FileMethods {
     void backUpData(String sourceFilePath, String backupFilePath);
     void restoreData();
     void listingBackupFiles();
-    void commit(List<Product> productList,String dataSourceFile, String transferFile);
+
 }

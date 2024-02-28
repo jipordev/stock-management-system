@@ -8,7 +8,7 @@ import org.nocrala.tools.texttablefmt.Table;
 public class MenuImpl implements Menu{
     @Override
     public void displayBanner() {
-        System.out.println("""
+        System.out.println(""" 
                 ###################################
                 WELCOME TO 
                 STOCK MANAGEMENT SYSTEM
@@ -34,6 +34,7 @@ public class MenuImpl implements Menu{
         System.out.println(table.render());
     }
 
+
     @Override
     public void displayHelp() {
         System.out.println("# Help Instruction");
@@ -53,6 +54,7 @@ public class MenuImpl implements Menu{
         table.addCell("13.     Press       1 : Navigate pagination to the first page");
         table.addCell("14.     Press       h : Help");
         table.addCell("15.     Press       b : Step Back of the Application");
+        table.addCell("16.     Press       x : Exit the Application");
 
         System.out.println(table.render());
     }

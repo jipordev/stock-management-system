@@ -1,15 +1,19 @@
-import service.FileMethods;
-import service.serviceimpl.FileMethodsImpl;
+import filemethods.FileMethods;
+import filemethods.FileMethodsImpl;
 import model.Product;
 import service.ProductService;
-import service.serviceimpl.ProductServiceImpl;
+import service.ProductServiceImpl;
 import util.Pagination;
 import util.PaginationImpl;
 import view.MenuImpl;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.System.*;
 
@@ -25,16 +29,46 @@ public class MainApplication {
     static FileMethods fileMethods = new FileMethodsImpl();
     static List<Product> productList = new ArrayList<>();
 
+    public static Duration timeOperation(Runnable operation) {
+        long startTime = System.nanoTime();
+        operation.run();
+        long endTime = System.nanoTime();
+        return Duration.ofNanos(endTime - startTime);
+    }
+    public static void loadDataUntilReady(AtomicBoolean isDataReady) {
+        final String[] animation = {"|", "/", "-", "\\"};
+        Thread startLoading = new Thread(() -> {
+            try {
+                int i = 0;
+                while (!isDataReady.get()) {
+                    System.out.print("\rLoading data " + animation[i % animation.length]);
+                    Thread.sleep(100);
+                    i++;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        startLoading.start();
+    }
+
     public static void main(String[] args) {
+
+        AtomicBoolean isReady = new AtomicBoolean(false);
+        loadDataUntilReady(isReady);
+
+        Duration readFile = timeOperation(()->{
 
         List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
         List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
         productList.addAll(dataSourceProducts);
         productList.addAll(transferProducts);
 
+        });
+        System.out.println("\n Completed! "+readFile.toSeconds()+"s");
+        isReady.set(true);
+
         do {
-            int pageNumber = 1;
-            int pageSize = pagination.setNewRow();
             menu.displayBanner();
             menu.displayMainMenu();
             out.print("Choose an option: ");
