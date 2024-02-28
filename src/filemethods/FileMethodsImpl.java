@@ -186,7 +186,7 @@ public class FileMethodsImpl implements FileMethods{
     public void checkFileForCommit(List<Product> productList){
         List<Product> transferProducts = readProductsFromFile("transproduct.bak");
         if(!(transferProducts.isEmpty())){
-            System.out.print("You need to commit first! [Y/N]: ");
+            System.out.print("You need to commit your record! [Yes/No] type [y/n]: ");
             String ops = scanner.next();
             if(ops.equalsIgnoreCase("y")){
                 List<Product> productAfterUpdate = new ArrayList<>();
@@ -212,9 +212,11 @@ public class FileMethodsImpl implements FileMethods{
                     productAfterUpdate.add(oldProduct);
                     writeToFile(productAfterUpdate,"product.bak");
                     clearFileTransfer("transproduct.bak");
+                    System.out.println("You chosen [Yes], You have saved your record!");
                 }
             }else{
                 clearFileTransfer("transproduct.bak");
+                System.out.println("You chosen [NO], Last record is lost!");
             }
         } else {
             System.out.println("Nothing to commit!!");
