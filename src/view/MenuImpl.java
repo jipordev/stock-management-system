@@ -1,9 +1,13 @@
 package view;
 
+import model.Product;
 import org.nocrala.tools.texttablefmt.BorderStyle;
 import org.nocrala.tools.texttablefmt.CellStyle;
 import org.nocrala.tools.texttablefmt.ShownBorders;
 import org.nocrala.tools.texttablefmt.Table;
+import service.ProductService;
+
+import java.util.List;
 
 public class MenuImpl implements Menu{
     @Override
@@ -24,6 +28,7 @@ public class MenuImpl implements Menu{
                 " ╚═════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═════╝     ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝    ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝   ";
         System.out.println(banner);
     }
+
 
     @Override
     public void displayMainMenu() {
@@ -57,5 +62,21 @@ public class MenuImpl implements Menu{
         table.addCell("16.     Press       x : Exit the Application");
 
         System.out.println(table.render());
+    }
+
+    @Override
+    public void confirmation(List<Product> productList, String code) {
+        Table confirmTable = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER_WIDE, ShownBorders.SURROUND);
+        for (Product product : productList) {
+            if (product.getProductCode().equals(code)) {
+                confirmTable.addCell("Product code : " + product.getProductCode());
+                confirmTable.addCell("Product name : " + product.getProductName());
+                confirmTable.addCell("Product price : " + product.getProductPrice());
+                confirmTable.addCell("Product qty : " + product.getQty());
+                confirmTable.addCell("Product date : " + product.getDate());
+                confirmTable.addCell("Product status : " + product.getStatus());
+            }
+        }
+        System.out.println(confirmTable.render());
     }
 }

@@ -30,18 +30,20 @@ public class FileMethodsImpl implements FileMethods {
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 6) {
-                    Product product = new Product();
-                    product.setProductCode(parts[0].trim());
-                    product.setProductName(parts[1].trim());
-                    product.setProductPrice(Double.parseDouble(parts[2].trim()));
-                    product.setQty(Integer.parseInt(parts[3].trim()));
-                    product.setDate(LocalDate.parse(parts[4].trim()));
-                    product.setStatus(parts[5].trim());
-                    productList.add(product);
-                } else {
-                    System.out.println("Invalid data in file: " + line);
+                if (!line.trim().isEmpty()) { // Check if the line is not empty
+                    String[] parts = line.split(",");
+                    if (parts.length == 6) {
+                        Product product = new Product();
+                        product.setProductCode(parts[0].trim());
+                        product.setProductName(parts[1].trim());
+                        product.setProductPrice(Double.parseDouble(parts[2].trim()));
+                        product.setQty(Integer.parseInt(parts[3].trim()));
+                        product.setDate(LocalDate.parse(parts[4].trim()));
+                        product.setStatus(parts[5].trim());
+                        productList.add(product);
+                    } else {
+                        System.out.println("Invalid data in file: " + line);
+                    }
                 }
             }
         } catch (IOException | NumberFormatException e) {
@@ -49,6 +51,7 @@ public class FileMethodsImpl implements FileMethods {
         }
         return productList;
     }
+
 
     @Override
     public void writeToFile(List<Product> productList, String fileName) {
@@ -68,6 +71,35 @@ public class FileMethodsImpl implements FileMethods {
             System.out.println("Error writing to file: " + e.getMessage());
         }
     }
+
+    @Override
+    public void updateRecord(List<Product> productList, String dataSourceFileName, String transferFileName) {
+        // Read products from the transfer file
+        List<Product> transferProducts = readProductsFromFile(transferFileName);
+
+        // Iterate through the main product list
+        for (Product product : productList) {
+            // Find matching product in the transfer file
+            for (Product transferProduct : transferProducts) {
+                if (product.getProductCode().equals(transferProduct.getProductCode())) {
+                    // Update product details
+                    product.setProductName(transferProduct.getProductName());
+                    product.setProductPrice(transferProduct.getProductPrice());
+                    product.setQty(transferProduct.getQty());
+                    product.setDate(transferProduct.getDate());
+                    product.setStatus(transferProduct.getStatus());
+                    break; // Stop searching for this product in the transfer file once updated
+                }
+            }
+        }
+
+        // Write the updated product list back to the main data file
+        writeToFile(productList, dataSourceFileName);
+
+        // Clear the transfer file
+        clearFileTransfer(transferFileName);
+    }
+
 
     @Override
     public String backupFileDir() {
@@ -188,49 +220,31 @@ public class FileMethodsImpl implements FileMethods {
             System.out.println("Backup directory does not exist or is not a directory");
         }
     }
+
     @Override
-    public void checkFileForCommit(List<Product> productList){
+    public void checkFileForCommit(List<Product> productList) {
         List<Product> transferProducts = readProductsFromFile("transproduct.bak");
-        if(!(transferProducts.isEmpty())){
+        if (!transferProducts.isEmpty()) {
             System.out.print("You need to commit your record! [Yes/No] type [y/n]: ");
             String ops = scanner.next();
-            if(ops.equalsIgnoreCase("y")){
-                List<Product> productAfterUpdate = new ArrayList<>();
-                for(Product oldProduct : productList){
-                    for(Product newProduct : transferProducts){
-                        if(newProduct.getProductCode().equals(oldProduct.getProductCode())){
-                            oldProduct.setProductCode(newProduct.getProductCode());
-                            oldProduct.setProductName(newProduct.getProductName());
-                            oldProduct.setProductPrice(newProduct.getProductPrice());
-                            oldProduct.setQty(newProduct.getQty());
-                            oldProduct.setDate(newProduct.getDate());
-                            oldProduct.setStatus(newProduct.getStatus());
-                        }
-                        else{
-                            oldProduct.setProductCode(oldProduct.getProductCode());
-                            oldProduct.setProductName(oldProduct.getProductName());
-                            oldProduct.setProductPrice(oldProduct.getProductPrice());
-                            oldProduct.setQty(oldProduct.getQty());
-                            oldProduct.setDate(oldProduct.getDate());
-                            oldProduct.setStatus(oldProduct.getStatus());
-                        }
-                    }
-                    if (oldProduct.getStatus().equals("delete")){
-                        productAfterUpdate.remove(oldProduct);
-                    } else {
-                        productAfterUpdate.add(oldProduct);
-                    }
-                    writeToFile(productAfterUpdate,"product.bak");
-                    clearFileTransfer("transproduct.bak");
-                }
-                System.out.println("You chosen [Yes], You have saved your record!");
-            }else{
-                System.out.println("You chosen [NO], You have not commit!");
+            if (ops.equalsIgnoreCase("y")) {
+                // Update records from transfer file to product list
+                updateRecord(productList,"product.bak","transproduct.bak");
+                System.out.println("You chose [Yes], You have saved your record!");
+
+                // Check for products with status "delete" in the transfer file and remove them from the main product list
+                List<Product> productsToDelete = transferProducts.stream()
+                        .filter(product -> product.getStatus().equalsIgnoreCase("delete"))
+                        .collect(Collectors.toList());
+                productList.removeAll(productsToDelete);
+            } else {
+                System.out.println("You chose [NO], You have not committed!");
             }
         } else {
             System.out.println("Nothing to commit!!");
         }
     }
+
 
     @Override
     public void displayCommit(List<Product> transferProduct) {

@@ -11,6 +11,8 @@ import service.FileMethods;
 import service.ProductService;
 import util.Pagination;
 import util.PaginationImpl;
+import view.Menu;
+import view.MenuImpl;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -30,6 +32,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final FileMethods fileMethods = new FileMethodsImpl();
     private final Pagination pagination = new PaginationImpl();
+    private final Menu menu = new MenuImpl();
     private final Scanner scanner = new Scanner(System.in);
 
 
@@ -108,9 +111,17 @@ public class ProductServiceImpl implements ProductService {
         product.setDate(LocalDate.now());
         product.setStatus("new");
         productList.add(product);
-        fileMethods.writeTransferRecord(product,TRANSFER_FILE);
+        menu.confirmation(productList,product.getProductCode());
+        System.out.print("Are you sure to create? (Y/N): ");
+        String confirm = scanner.nextLine();
+        if (confirm.equalsIgnoreCase("y")){
+            fileMethods.writeTransferRecord(product,TRANSFER_FILE);
 
-        System.out.println("New product created successfully.");
+            System.out.println("New product created successfully.");
+        } else {
+            productList.remove(product);
+            System.out.println("Fail to create product");
+        }
     }
 
     @Override
@@ -194,122 +205,133 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void updateProduct(List<Product> productList) {
-        Table tableUpdate = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND);
-        Product updateProduct = new Product();
         System.out.println("""
-                1. Update all
-                2. Update name
-                3. Update Price
-                4. Update Qty
-                """);
+        1. Update all
+        2. Update name
+        3. Update Price
+        4. Update Qty
+        """);
         System.out.print("Choose option to update : ");
         int op = Integer.parseInt(scanner.nextLine());
         switch (op) {
             case 1 -> {
                 System.out.print("Enter product code : ");
                 String code = scanner.nextLine();
+
+                // Check if the product exists
+                boolean found = false;
                 for (Product product : productList) {
                     if (product.getProductCode().equals(code)) {
-                        tableUpdate.addCell("Product code: "+product.getProductCode());
-                        tableUpdate.addCell("Product name: "+product.getProductName());
-                        tableUpdate.addCell("Product price: "+product.getProductPrice());
-                        tableUpdate.addCell("Product quantity: "+product.getQty());
-                        tableUpdate.addCell("Product date: "+product.getDate());
-                        tableUpdate.addCell("Product status: "+product.getStatus());
-                        System.out.println(tableUpdate.render());
+                        menu.confirmation(productList, code); // Display current details
+                        System.out.println("-----Enter new product details-----");
+                        System.out.print("Enter new product name: ");
+                        String newName = scanner.nextLine();
+                        System.out.print("Enter new product price: ");
+                        double newPrice = Double.parseDouble(scanner.nextLine());
+                        System.out.print("Enter new product quantity: ");
+                        int newQty = Integer.parseInt(scanner.nextLine());
 
-                        System.out.print("Enter new NAME : ");
-                        updateProduct.setProductName(scanner.nextLine());
-                        System.out.print("Enter new PRICE : ");
-                        updateProduct.setProductPrice(Double.parseDouble(scanner.nextLine()));
-                        System.out.print("Enter new QTY : ");
-                        updateProduct.setQty(Integer.parseInt(scanner.nextLine()));
-                        updateProduct.setDate(LocalDate.now());
-                        updateProduct.setStatus("update");
-                        updateProduct.setProductCode(product.getProductCode());
-                        productList.set(productList.indexOf(product), updateProduct);
-                        fileMethods.writeTransferRecord(updateProduct,TRANSFER_FILE);
+                        System.out.println("Please confirm updating all details (Y/N): ");
+                        String confirmation = scanner.nextLine().trim().toLowerCase();
+                        if (confirmation.equals("y")) {
+                            // Update product details
+                            product.setProductName(newName);
+                            product.setProductPrice(newPrice);
+                            product.setQty(newQty);
+                            product.setDate(LocalDate.now());
+                            product.setStatus("update");
+
+                            // Write updated product to transfer file
+                            fileMethods.writeTransferRecord(product, TRANSFER_FILE);
+                            System.out.println("Product updated successfully.");
+                        } else {
+                            System.out.println("Update canceled.");
+                        }
+                        found = true;
+                        break; // Exiting the loop once the product is found and updated
                     }
+                }
+                if (!found) {
+                    System.out.println("Product not found");
                 }
             }
             case 2 -> {
                 System.out.print("Enter product code: ");
-                String proCode = scanner.nextLine();
-                for (Product product : productList){
-                    if (product.getProductCode().equals(proCode)){
-                        tableUpdate.addCell("Product code: "+product.getProductCode());
-                        tableUpdate.addCell("Product name: "+product.getProductName());
-                        tableUpdate.addCell("Product price: "+product.getProductPrice());
-                        tableUpdate.addCell("Product quantity: "+product.getQty());
-                        tableUpdate.addCell("Product date: "+product.getDate());
-                        tableUpdate.addCell("Product status: "+product.getStatus());
-                        System.out.println(tableUpdate.render());
-
+                String code = scanner.nextLine();
+                for (Product product : productList) {
+                    if (product.getProductCode().equals(code)) {
+                        menu.confirmation(productList, code); // Display current details
                         System.out.print("Enter new product name: ");
-                        updateProduct.setProductName(scanner.nextLine());
-                        updateProduct.setProductCode(product.getProductCode());
-                        updateProduct.setProductPrice(product.getProductPrice());
-                        updateProduct.setQty(product.getQty());
-                        updateProduct.setDate(product.getDate());
-                        updateProduct.setStatus("update");
-                        productList.set(productList.indexOf(product), updateProduct);
-                        fileMethods.writeTransferRecord(updateProduct, TRANSFER_FILE);
+                        String newName = scanner.nextLine();
+                        System.out.println("Please confirm updating product name (Y/N): ");
+                        String confirmation = scanner.nextLine().trim().toLowerCase();
+                        if (confirmation.equals("y")) {
+                            product.setProductName(newName);
+                            product.setDate(LocalDate.now());
+                            product.setStatus("update");
+                            fileMethods.writeTransferRecord(product, TRANSFER_FILE);
+                            System.out.println("Product name updated successfully.");
+                        } else {
+                            System.out.println("Update canceled.");
+                        }
+                        return;
                     }
                 }
+                System.out.println("Product not found");
             }
             case 3 -> {
                 System.out.print("Enter product code: ");
-                String proCode = scanner.nextLine();
-                for (Product product : productList){
-                    if (product.getProductCode().equals(proCode)){
-                        tableUpdate.addCell("Product code: "+product.getProductCode());
-                        tableUpdate.addCell("Product name: "+product.getProductName());
-                        tableUpdate.addCell("Product price: "+product.getProductPrice());
-                        tableUpdate.addCell("Product quantity: "+product.getQty());
-                        tableUpdate.addCell("Product date: "+product.getDate());
-                        tableUpdate.addCell("Product status: "+product.getStatus());
-                        System.out.println(tableUpdate.render());
-
+                String code = scanner.nextLine();
+                for (Product product : productList) {
+                    if (product.getProductCode().equals(code)) {
+                        menu.confirmation(productList, code); // Display current details
                         System.out.print("Enter new product price: ");
-                        updateProduct.setProductPrice(Double.parseDouble(scanner.nextLine()));
-                        updateProduct.setProductName(product.getProductName());
-                        updateProduct.setProductCode(product.getProductCode());
-                        updateProduct.setQty(product.getQty());
-                        updateProduct.setDate(product.getDate());
-                        updateProduct.setStatus("update");
-                        productList.set(productList.indexOf(product), updateProduct);
-                        fileMethods.writeTransferRecord(updateProduct, TRANSFER_FILE);
+                        double newPrice = Double.parseDouble(scanner.nextLine());
+                        System.out.println("Please confirm updating product name (Y/N): ");
+                        String confirmation = scanner.nextLine().trim().toLowerCase();
+                        if (confirmation.equals("y")) {
+                            product.setProductPrice(newPrice);
+                            product.setDate(LocalDate.now());
+                            product.setStatus("update");
+                            fileMethods.writeTransferRecord(product, TRANSFER_FILE);
+                            System.out.println("Product name updated successfully.");
+                        } else {
+                            System.out.println("Update canceled.");
+                        }
+                        return;
                     }
                 }
+                System.out.println("Product not found");
             }
             case 4 -> {
                 System.out.print("Enter product code: ");
-                String proCode = scanner.nextLine();
-                for (Product product : productList){
-                    if (product.getProductCode().equals(proCode)){
-                        tableUpdate.addCell("Product code: "+product.getProductCode());
-                        tableUpdate.addCell("Product name: "+product.getProductName());
-                        tableUpdate.addCell("Product price: "+product.getProductPrice());
-                        tableUpdate.addCell("Product quantity: "+product.getQty());
-                        tableUpdate.addCell("Product date: "+product.getDate());
-                        tableUpdate.addCell("Product status: "+product.getStatus());
-                        System.out.println(tableUpdate.render());
-
+                String code = scanner.nextLine();
+                for (Product product : productList) {
+                    if (product.getProductCode().equals(code)) {
+                        menu.confirmation(productList, code); // Display current details
                         System.out.print("Enter new product qty: ");
-                        updateProduct.setQty(Integer.parseInt(scanner.nextLine()));
-                        updateProduct.setProductPrice(product.getProductPrice());
-                        updateProduct.setProductName(product.getProductName());
-                        updateProduct.setProductCode(product.getProductCode());
-                        updateProduct.setDate(product.getDate());
-                        updateProduct.setStatus("update");
-                        productList.set(productList.indexOf(product), updateProduct);
-                        fileMethods.writeTransferRecord(updateProduct, TRANSFER_FILE);
+                        int newQty = Integer.parseInt(scanner.nextLine());
+                        System.out.println("Please confirm updating product name (Y/N): ");
+                        String confirmation = scanner.nextLine().trim().toLowerCase();
+                        if (confirmation.equals("y")) {
+                            product.setQty(newQty);
+                            product.setDate(LocalDate.now());
+                            product.setStatus("update");
+                            fileMethods.writeTransferRecord(product, TRANSFER_FILE);
+                            System.out.println("Product name updated successfully.");
+                        } else {
+                            System.out.println("Update canceled.");
+                        }
+                        return;
                     }
                 }
+                System.out.println("Product not found");
             }
             default -> System.out.println("Invalid update option");
         }
     }
+
+
     @Override
     public void displayAllProduct(List<Product> productList, int pageNumber, int pageSize) {
         boolean isTrue;

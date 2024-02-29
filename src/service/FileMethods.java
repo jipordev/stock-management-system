@@ -9,6 +9,7 @@ public interface FileMethods {
     List<Product> readProductsFromFile(String fileName);
 
     void writeToFile(List<Product> productList, String fileName);
+    void updateRecord(List<Product> productList, String dataSourceFileName, String transferFileName);
     String  backupFileDir();
     void writeTransferRecord(Product product, String transferFileName);
     boolean hasData(String fileName);
