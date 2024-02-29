@@ -38,8 +38,6 @@ public class MenuImpl implements Menu{
         table.addCell("             Set R(o)w | (C)ommit | Bac(k) up | Res(t)ore | (H)elp | E(x)it              ",cellStyle);
         System.out.println(table.render());
     }
-
-
     @Override
     public void displayHelp() {
         System.out.println("# Help Instruction");
