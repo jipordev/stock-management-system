@@ -68,7 +68,7 @@ public class FileMethodsImpl implements FileMethods {
                 writer.flush();
                 writer.newLine();
             }
-            System.out.println("Data written to file successfully.");
+            System.out.println("\nData written to file successfully.");
         } catch (IOException e) {
             Message.errMessage("Error writing to file: " + e.getMessage());
         }

@@ -41,21 +41,36 @@ public class ProductServiceImpl implements ProductService {
         return Duration.ofNanos(endTime - startTime);
     }
 
-    public void loadDataUntilReady(AtomicBoolean isDataReady) {
-        final String[] animation = {"|", "/", "-", "\\"};
-        Thread startLoading = new Thread(() -> {
+    static String[] animation = {"\033[31m⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏\033[0m"};
+    final static int progressBarWidth = 30;
+    public static void loadDataUntilReady(AtomicBoolean isDataReady) {
+        new Thread(() -> {
             try {
                 int i = 0;
                 while (!isDataReady.get()) {
-                    System.out.print("\rLoading data " + animation[i % animation.length]);
-                    Thread.sleep(100);
+                    String progressBar = generateProgressBar(i % animation[0].length(), progressBarWidth);
+                    System.out.print("\r\033[36mLoading data " + animation[0].charAt(i % animation[0].length()) +
+                            " \033[32m" + progressBar + " \033[0m");
+                    Thread.sleep(getRandomSpeed());
                     i++;
                 }
-            } catch (InterruptedException e) {
-                Message.errMessage(e.getMessage());
+                System.out.println();
+            } catch (Exception e) {
+                e.getMessage();
             }
-        });
-        startLoading.start();
+        }).start();
+    }
+    static String generateProgressBar(int animationIndex, int width) {
+        StringBuilder progressBar = new StringBuilder("[");
+        int filledWidth = (animationIndex * width) / animation[0].length();
+        for (int i = 0; i < width; i++) {
+            progressBar.append(i == filledWidth ? "\033[33m█" : " ");
+        }
+        progressBar.append("\033[0m]");
+        return progressBar.toString();
+    }
+    static int getRandomSpeed() {
+        return (int) (Math.random() * 150 + 50);
     }
 
     @Override
