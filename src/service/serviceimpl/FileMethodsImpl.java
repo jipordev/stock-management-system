@@ -6,6 +6,8 @@ import org.nocrala.tools.texttablefmt.CellStyle;
 import org.nocrala.tools.texttablefmt.ShownBorders;
 import org.nocrala.tools.texttablefmt.Table;
 import service.FileMethods;
+import util.Message;
+import util.exception.StringRegex;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -47,7 +49,7 @@ public class FileMethodsImpl implements FileMethods {
                 }
             }
         } catch (IOException | NumberFormatException e) {
-            System.out.println("Error reading file: " + e.getMessage());
+            Message.errMessage("Error reading file: " + e.getMessage());
         }
         return productList;
     }
@@ -68,7 +70,7 @@ public class FileMethodsImpl implements FileMethods {
             }
             System.out.println("Data written to file successfully.");
         } catch (IOException e) {
-            System.out.println("Error writing to file: " + e.getMessage());
+            Message.errMessage("Error writing to file: " + e.getMessage());
         }
     }
 
@@ -123,7 +125,7 @@ public class FileMethodsImpl implements FileMethods {
             writer.newLine();
             System.out.println("Transfer record written successfully.");
         } catch (IOException e) {
-            System.err.println("Error writing transfer record: " + e.getMessage());
+            Message.errMessage("Error writing transfer record: " + e.getMessage());
         }
     }
 
@@ -160,43 +162,47 @@ public class FileMethodsImpl implements FileMethods {
                 System.out.println("Source file does not exist.");
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            Message.errMessage(e.getMessage());
         }
     }
 
     @Override
     public void restoreData() {
-        listingBackupFiles();
-        String backupDirectory = "backup/";
-        String restoreDirectory = "restore/";
+        try {
+            listingBackupFiles();
+            String backupDirectory = "backup/";
+            String restoreDirectory = "restore/";
 
-        System.out.print("Choose the number of the file you want to restore: ");
-        int fileNumber = Integer.parseInt(new Scanner(System.in).nextLine());
+            System.out.print("Choose the number of the file you want to restore: ");
+            int fileNumber = Integer.parseInt(new Scanner(System.in).nextLine());
 
-        // Validate user input
-        File backupDir = new File(backupDirectory);
-        File[] files = backupDir.listFiles();
-        if (files != null && fileNumber >= 1 && fileNumber <= files.length) {
-            File selectedBackupFile = files[fileNumber - 1];
+            // Validate user input
+            File backupDir = new File(backupDirectory);
+            File[] files = backupDir.listFiles();
+            if (files != null && fileNumber >= 1 && fileNumber <= files.length) {
+                File selectedBackupFile = files[fileNumber - 1];
 
-            // Create restore directory if it doesn't exist
-            File restoreDir = new File(restoreDirectory);
-            if (!restoreDir.exists()) {
-                restoreDir.mkdirs();
+                // Create restore directory if it doesn't exist
+                File restoreDir = new File(restoreDirectory);
+                if (!restoreDir.exists()) {
+                    restoreDir.mkdirs();
+                }
+
+                // Construct the path for the restored file
+                String restoredFilePath = restoreDirectory + selectedBackupFile.getName();
+
+                // Copy the selected backup file to the restore directory
+                try {
+                    Files.copy(selectedBackupFile.toPath(), Paths.get(restoredFilePath), StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("File successfully restored to: " + restoredFilePath);
+                } catch (IOException e) {
+                    System.err.println("Error restoring file: " + e.getMessage());
+                }
+            } else {
+                System.out.println("Invalid file number selected.");
             }
-
-            // Construct the path for the restored file
-            String restoredFilePath = restoreDirectory + selectedBackupFile.getName();
-
-            // Copy the selected backup file to the restore directory
-            try {
-                Files.copy(selectedBackupFile.toPath(), Paths.get(restoredFilePath), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("File successfully restored to: " + restoredFilePath);
-            } catch (IOException e) {
-                System.err.println("Error restoring file: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Invalid file number selected.");
+        } catch (Exception e) {
+            Message.errMessage(e.getMessage());
         }
     }
 
@@ -223,25 +229,33 @@ public class FileMethodsImpl implements FileMethods {
 
     @Override
     public void checkFileForCommit(List<Product> productList) {
-        List<Product> transferProducts = readProductsFromFile("transproduct.bak");
-        if (!transferProducts.isEmpty()) {
-            System.out.print("You need to commit your record! [Yes/No] type [y/n]: ");
-            String ops = scanner.next();
-            if (ops.equalsIgnoreCase("y")) {
-                // Update records from transfer file to product list
-                updateRecord(productList,"product.bak","transproduct.bak");
-                System.out.println("You chose [Yes], You have saved your record!");
+        try {
+            List<Product> transferProducts = readProductsFromFile("transproduct.bak");
+            if (!transferProducts.isEmpty()) {
+                System.out.print("You need to commit your record! [Yes/No] type [y/n]: ");
+                String ops = scanner.next();
+                if (StringRegex.validateString(ops,"[yYnY]")){
+                    if (ops.equalsIgnoreCase("y")) {
+                        // Update records from transfer file to product list
+                        updateRecord(productList,"product.bak","transproduct.bak");
+                        System.out.println("You chose [Yes], You have saved your record!");
 
-                // Check for products with status "delete" in the transfer file and remove them from the main product list
-                List<Product> productsToDelete = transferProducts.stream()
-                        .filter(product -> product.getStatus().equalsIgnoreCase("delete"))
-                        .collect(Collectors.toList());
-                productList.removeAll(productsToDelete);
+                        // Check for products with status "delete" in the transfer file and remove them from the main product list
+                        List<Product> productsToDelete = transferProducts.stream()
+                                .filter(product -> product.getStatus().equalsIgnoreCase("delete"))
+                                .collect(Collectors.toList());
+                        productList.removeAll(productsToDelete);
+                    } else {
+                        System.out.println("You chose [NO], You have not committed!");
+                    }
+                } else {
+                    System.out.println("You choose wrong option");
+                }
             } else {
-                System.out.println("You chose [NO], You have not committed!");
+                System.out.println("Nothing to commit!!");
             }
-        } else {
-            System.out.println("Nothing to commit!!");
+        } catch (Exception e){
+            Message.errMessage(e.getMessage());
         }
     }
 
@@ -276,7 +290,7 @@ public class FileMethodsImpl implements FileMethods {
         try(BufferedWriter writeToClear = new BufferedWriter(new FileWriter(TRANSFER_FILE))){
             writeToClear.write("");
         }catch (IOException e){
-            System.out.println("Transfer File Not Found!" + e.getMessage());
+            Message.errMessage("Transfer File Not Found!" + e.getMessage());
         }
     }
 }

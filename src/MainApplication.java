@@ -5,10 +5,9 @@ import service.ProductService;
 import service.serviceimpl.ProductServiceImpl;
 import util.Pagination;
 import util.PaginationImpl;
+import util.exception.StringRegex;
 import view.MenuImpl;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +45,7 @@ public class MainApplication {
                     i++;
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                out.println(e.getMessage());
             }
         });
         startLoading.start();
@@ -72,35 +71,43 @@ public class MainApplication {
             int pageSize = pagination.setNewRow();
             menu.displayBanner();
             menu.displayMainMenu();
-            out.print("Choose an option: ");
-            String op = scanner.nextLine();
-            switch (op) {
-                case "l" -> productService.displayAllProduct(productList, pageNumber, pageSize);
-                case "m" -> productService.randomRecord(productList);
-                case "w" -> productService.createProduct(productList);
-                case "r" -> productService.readProduct(productList);
-                case "e" -> productService.updateProduct(productList);
-                case "d" -> productService.deleteProduct(productList);
-                case "s" -> productService.searchProductByName();
-                case "o" -> pagination.setPageSize(scanner);
-                case "c" -> {
-                    fileMethods.displayCommit(productList);
-                    fileMethods.checkFileForCommit(productList);
-                }
-                case "k" -> {
-                    String backupFilePath = fileMethods.backupFileDir();
-                    System.out.print("Are you sure to Backup [Y/N]: ");
-                    String ch = scanner.nextLine();
-                    if (ch.equalsIgnoreCase("y")) {
-                        fileMethods.backUpData(DATA_SOURCE_FILE, backupFilePath);
+            try {
+                out.print("Choose an option: ");
+                String op = scanner.nextLine();
+                switch (op) {
+                    case "l" -> productService.displayAllProduct(productList, pageNumber, pageSize);
+                    case "m" -> productService.randomRecord(productList);
+                    case "w" -> productService.createProduct(productList);
+                    case "r" -> productService.readProduct(productList);
+                    case "e" -> productService.updateProduct(productList);
+                    case "d" -> productService.deleteProduct(productList);
+                    case "s" -> productService.searchProductByName();
+                    case "o" -> pagination.setPageSize(scanner);
+                    case "c" -> {
+                        fileMethods.displayCommit(productList);
+                        fileMethods.checkFileForCommit(productList);
+                    }
+                    case "k" -> {
+                        String backupFilePath = fileMethods.backupFileDir();
+                        System.out.print("Are you sure to Backup [Y/N]: ");
+                        String ch = scanner.nextLine();
+                        if (StringRegex.validateString(ch,"[yYnN]")){
+                            if (ch.equalsIgnoreCase("y")) {
+                                fileMethods.backUpData(DATA_SOURCE_FILE, backupFilePath);
+                            }
+                        } else {
+                            out.println("Invalid input. please enter 'Y' or 'N'.");
+                        }
+                    }
+                    case "t" -> fileMethods.restoreData();
+                    case "h" -> menu.displayHelp();
+                    case "x" -> {
+                        fileMethods.checkFileForCommit(productList);
+                        System.exit(0);
                     }
                 }
-                case "t" -> fileMethods.restoreData();
-                case "h" -> menu.displayHelp();
-                case "x" -> {
-                    fileMethods.checkFileForCommit(productList);
-                    System.exit(0);
-                }
+            }catch (Exception e){
+                out.println("Error message: " + e.getMessage());
             }
         } while (true);
     }
