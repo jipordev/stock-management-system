@@ -19,5 +19,7 @@ public interface FileMethods {
 
     void checkFileForCommit(List<Product> productList);
     void clearFileTransfer(String TRANSFER_FILE);
+    void destroy(String TRANSFER_FILE);
     void displayCommit(List<Product> transferProduct);
+
 }

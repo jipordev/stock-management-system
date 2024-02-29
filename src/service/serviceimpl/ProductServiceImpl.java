@@ -41,21 +41,35 @@ public class ProductServiceImpl implements ProductService {
         return Duration.ofNanos(endTime - startTime);
     }
 
-    public void loadDataUntilReady(AtomicBoolean isDataReady) {
-        final String[] animation = {"|", "/", "-", "\\"};
-        Thread startLoading = new Thread(() -> {
+    static String[] animation = {"\033[31m⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏\033[0m"};
+    final static int progressBarWidth = 30;
+    public static void loadDataUntilReady(AtomicBoolean isDataReady) {
+        new Thread(() -> {
             try {
                 int i = 0;
                 while (!isDataReady.get()) {
-                    System.out.print("\rLoading data " + animation[i % animation.length]);
-                    Thread.sleep(100);
+                    String progressBar = generateProgressBar(i % animation[0].length(), progressBarWidth);
+                    System.out.print("\r\033[36mLoading data " + animation[0].charAt(i % animation[0].length()) +
+                            " \033[32m" + progressBar + " \033[0m");
+                    Thread.sleep(getRandomSpeed());
                     i++;
                 }
-            } catch (InterruptedException e) {
-                Message.errMessage(e.getMessage());
+            } catch (Exception e) {
+                e.getMessage();
             }
-        });
-        startLoading.start();
+        }).start();
+    }
+    static String generateProgressBar(int animationIndex, int width) {
+        StringBuilder progressBar = new StringBuilder("[");
+        int filledWidth = (animationIndex * width) / animation[0].length();
+        for (int i = 0; i < width; i++) {
+            progressBar.append(i == filledWidth ? "\033[33m█" : " ");
+        }
+        progressBar.append("\033[0m]");
+        return progressBar.toString();
+    }
+    static int getRandomSpeed() {
+        return (int) (Math.random() * 150 + 50);
     }
 
     @Override
@@ -75,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
                 Duration randomTime = timeOperation(() -> {
                     for (int i = 0; i < randomNumber; i++) {
                         products[i] = new Product();
-                        products[i].setProductCode("CSTAD00" + i);
+                        products[i].setProductCode("CSTAD" + i);
                         products[i].setProductName("Product::" + i);
                         products[i].setProductPrice(0.0);
                         products[i].setQty(0);
@@ -382,7 +396,7 @@ public class ProductServiceImpl implements ProductService {
             System.out.println(table.render());
             System.out.println("o" + "~".repeat(125) + "o");
             int totalPage = (int) Math.ceil((double) productList.size() / pageSize); // Calculate total pages
-            System.out.printf("Page: %d of %d \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   Total Records: %d%n", pageNumber, totalPage, productList.size());
+            System.out.printf("Page: %d of %d \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   Total Records: %d%n", pageNumber, totalPage, productList.size());
             System.out.print("Page Navigation\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(F)irst  (P)revious  (G)oto  (N)ext  (L)ast \n");
             System.out.println("o" + "~".repeat(125) + "o");
             String option;

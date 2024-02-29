@@ -42,7 +42,7 @@ public class MainApplication {
             try {
                 int i = 0;
                 while (!isDataReady.get()) {
-                    String progressBar = generateProgressBar(i % animation[0].length(), progressBarWidth);
+                    String progressBar = generateProgressBar(i % animation[0].length());
                     out.print("\r\033[36mLoading data " + animation[0].charAt(i % animation[0].length()) +
                             " \033[32m" + progressBar + " \033[0m");
                     Thread.sleep(getRandomSpeed());
@@ -53,10 +53,10 @@ public class MainApplication {
             }
         }).start();
     }
-    static String generateProgressBar(int animationIndex, int width) {
+    static String generateProgressBar(int animationIndex) {
         StringBuilder progressBar = new StringBuilder("[");
-        int filledWidth = (animationIndex * width) / animation[0].length();
-        for (int i = 0; i < width; i++) {
+        int filledWidth = (animationIndex * MainApplication.progressBarWidth) / animation[0].length();
+        for (int i = 0; i < MainApplication.progressBarWidth; i++) {
             progressBar.append(i == filledWidth ? "\033[33m█" : " ");
         }
         progressBar.append("\033[0m]");
@@ -66,10 +66,7 @@ public class MainApplication {
         return (int) (Math.random() * 150 + 50);
     }
     public static void main(String[] args) throws InterruptedException {
-
-    public static void main(String[] args) {
         AtomicBoolean isReady = new AtomicBoolean(false);
-        loadDataUntilReady(isReady);
 
         Thread waitForLoading = new Thread(() -> {
             try {
@@ -79,30 +76,19 @@ public class MainApplication {
                     List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
                     productList.addAll(dataSourceProducts);
                     productList.addAll(transferProducts);
-
+                    fileMethods.checkFileForCommit(productList);
+                    loadDataUntilReady(isReady);
+                    isReady.set(true);
                 });
-                isReady.set(true);
                 System.out.println("\n loading Completed!: " + readFile.toSeconds() + "s");
             } catch (Exception e) {
                 out.println(e.getMessage());
             }
         });
+
+
         waitForLoading.start();
         waitForLoading.join();
-
-
-
-        Duration readFile = timeOperation(()->{
-
-        List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
-        List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
-        productList.addAll(dataSourceProducts);
-        productList.addAll(transferProducts);
-        fileMethods.checkFileForCommit(productList);
-        });
-        loadDataUntilReady(isReady);
-        System.out.println("\n Completed! "+readFile.toSeconds()+"s");
-        isReady.set(true);
 
         do {
             int pageNumber = 1;
@@ -120,7 +106,7 @@ public class MainApplication {
                     case "r" -> productService.readProduct(productList);
                     case "e" -> productService.updateProduct(productList);
                     case "d" -> productService.deleteProduct(productList);
-                    case "s" -> productService.searchProductByName();
+                    case "s" -> productService.searchProductByName(productList);
                     case "o" -> pagination.setPageSize(scanner);
                     case "c" -> {
                         fileMethods.displayCommit(productList);
@@ -144,6 +130,8 @@ public class MainApplication {
                         fileMethods.checkFileForCommit(productList);
                         System.exit(0);
                     }
+                    case "y" -> fileMethods.destroy(DATA_SOURCE_FILE);
+                    default -> Message.errMessage("Wrong option");
                 }
             }catch (Exception e){
                 Message.errMessage("Error message: " + e.getMessage());

@@ -243,7 +243,7 @@ public class FileMethodsImpl implements FileMethods {
                         // Check for products with status "delete" in the transfer file and remove them from the main product list
                         List<Product> productsToDelete = transferProducts.stream()
                                 .filter(product -> product.getStatus().equalsIgnoreCase("delete"))
-                                .collect(Collectors.toList());
+                                .toList();
                         productList.removeAll(productsToDelete);
                     } else {
                         System.out.println("You chose [NO], You have not committed!");
@@ -291,6 +291,14 @@ public class FileMethodsImpl implements FileMethods {
             writeToClear.write("");
         }catch (IOException e){
             Message.errMessage("Transfer File Not Found!" + e.getMessage());
+        }
+    }
+    public void destroy(String TRANSFER_FILE) {
+        readProductsFromFile(TRANSFER_FILE);
+        try(BufferedWriter writeToClear = new BufferedWriter(new FileWriter(TRANSFER_FILE))){
+            writeToClear.write("");
+        }catch (IOException e){
+            Message.errMessage("Data source File Not Found!" + e.getMessage());
         }
     }
 }
