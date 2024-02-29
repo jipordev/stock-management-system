@@ -48,7 +48,6 @@ public class MainApplication {
                 case "c" -> {
                     fileMethods.displayCommit(transferProducts);
                     fileMethods.checkFileForCommit(productList);
-                    fileMethods.clearFileTransfer(TRANSFER_FILE);
                 }
                 case "k" -> {
                     String backupFilePath = fileMethods.backupFileDir();

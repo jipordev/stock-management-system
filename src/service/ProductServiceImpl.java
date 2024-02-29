@@ -63,8 +63,6 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(List<Product> productList) {
         Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER,ShownBorders.SURROUND);
         // Read products from the data source file
-        //productList = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
-
         System.out.print("Enter code to delete: ");
         String codeToDelete = scanner.nextLine();
 
@@ -73,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
                 .filter(product -> product.getProductCode().equals(codeToDelete))
                 .findFirst();
 
-        // Check if the product exists
+        // Check if the product exists1
         if (productToDeleteOpt.isPresent()) {
             Product productToDelete = productToDeleteOpt.get();
             // Add the product to the transfer file with status "delete"

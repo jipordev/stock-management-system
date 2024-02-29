@@ -15,5 +15,6 @@ public interface FileMethods {
     void listingBackupFiles();
     void checkFileForCommit(List<Product> productList);
     void clearFileTransfer(String TRANSFER_FILE);
+    void deleteFromFile(List<Product> productList);
     void displayCommit(List<Product> transferProduct);
 }
