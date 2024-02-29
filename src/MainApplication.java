@@ -35,38 +35,61 @@ public class MainApplication {
         long endTime = System.nanoTime();
         return Duration.ofNanos(endTime - startTime);
     }
+    static String[] animation = {"\033[31m⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏\033[0m"};
+    final static int progressBarWidth = 30;
     public static void loadDataUntilReady(AtomicBoolean isDataReady) {
-        final String[] animation = {"|", "/", "-", "\\"};
-        Thread startLoading = new Thread(() -> {
+        new Thread(() -> {
             try {
                 int i = 0;
                 while (!isDataReady.get()) {
-                    System.out.print("\rLoading data " + animation[i % animation.length]);
-                    Thread.sleep(100);
+                    String progressBar = generateProgressBar(i % animation[0].length(), progressBarWidth);
+                    out.print("\r\033[36mLoading data " + animation[0].charAt(i % animation[0].length()) +
+                            " \033[32m" + progressBar + " \033[0m");
+                    Thread.sleep(getRandomSpeed());
                     i++;
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                e.getMessage();
             }
-        });
-        startLoading.start();
+        }).start();
     }
-
-    public static void main(String[] args) {
-
+    static String generateProgressBar(int animationIndex, int width) {
+        StringBuilder progressBar = new StringBuilder("[");
+        int filledWidth = (animationIndex * width) / animation[0].length();
+        for (int i = 0; i < width; i++) {
+            progressBar.append(i == filledWidth ? "\033[33m█" : " ");
+        }
+        progressBar.append("\033[0m]");
+        return progressBar.toString();
+    }
+    static int getRandomSpeed() {
+        return (int) (Math.random() * 150 + 50);
+    }
+    public static void main(String[] args) throws InterruptedException {
         AtomicBoolean isReady = new AtomicBoolean(false);
         loadDataUntilReady(isReady);
 
-        Duration readFile = timeOperation(()->{
+        Thread waitForLoading = new Thread(() -> {
+            try {
+                Thread.sleep(9);
+                Duration readFile = timeOperation(() -> {
+                    List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
+                    List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
+                    productList.addAll(dataSourceProducts);
+                    productList.addAll(transferProducts);
 
-        List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
-        List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
-        productList.addAll(dataSourceProducts);
-        productList.addAll(transferProducts);
-
+                });
+                isReady.set(true);
+                System.out.println("\n loading Completed!: " + readFile.toSeconds() + "s");
+            } catch (Exception e) {
+                out.println(e.getMessage());
+            }
         });
-        System.out.println("\n Completed! "+readFile.toSeconds()+"s");
-        isReady.set(true);
+        waitForLoading.start();
+        waitForLoading.join();
+
+
+
 
         do {
             int pageNumber = 1;
@@ -74,6 +97,7 @@ public class MainApplication {
 
             menu.displayBanner();
             menu.displayMainMenu();
+
             out.print("Choose an option: ");
             String op = scanner.nextLine();
             switch (op) {
