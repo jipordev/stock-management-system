@@ -1,4 +1,4 @@
-package filemethods;
+package service;
 
 import model.Product;
 
