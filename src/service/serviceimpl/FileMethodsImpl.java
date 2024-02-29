@@ -8,7 +8,9 @@ import org.nocrala.tools.texttablefmt.Table;
 import service.FileMethods;
 
 import java.io.*;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -50,7 +52,7 @@ public class FileMethodsImpl implements FileMethods {
 
     @Override
     public void writeToFile(List<Product> productList, String fileName) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName,true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for (Product p : productList) {
                 writer.write(p.getProductCode() + "," +
                         p.getProductName() + "," +
@@ -75,7 +77,6 @@ public class FileMethodsImpl implements FileMethods {
         String  backupFileName = "backupfile_" + timestamp + ".bak";
         return backupDirectory + backupFileName;
     }
-
     @Override
     public void writeTransferRecord(Product product, String transferFileName) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(transferFileName, true))) {
@@ -103,7 +104,6 @@ public class FileMethodsImpl implements FileMethods {
             return false;
         }
     }
-
     @Override
     public void backUpData(String sourceFilePath, String backupFilePath) {
         try {

@@ -1,5 +1,7 @@
 package service.serviceimpl;
 
+import service.FileMethods;
+import service.serviceimpl.FileMethodsImpl;
 import model.Product;
 import org.nocrala.tools.texttablefmt.BorderStyle;
 import org.nocrala.tools.texttablefmt.CellStyle;
@@ -106,16 +108,15 @@ public class ProductServiceImpl implements ProductService {
         product.setDate(LocalDate.now());
         product.setStatus("new");
         productList.add(product);
-        fileMethods.writeTransferRecord(product, TRANSFER_FILE);
+        fileMethods.writeTransferRecord(product,TRANSFER_FILE);
 
         System.out.println("New product created successfully.");
     }
 
     @Override
     public void deleteProduct(List<Product> productList) {
-        Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND);
+        Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER,ShownBorders.SURROUND);
         // Read products from the data source file
-
         System.out.print("Enter code to delete: ");
         String codeToDelete = scanner.nextLine();
 
@@ -138,16 +139,16 @@ public class ProductServiceImpl implements ProductService {
             );
             fileMethods.writeTransferRecord(transferProduct, TRANSFER_FILE);
 
-            table.addCell("Product code: " + productToDelete.getProductCode());
-            table.addCell("Product name: " + productToDelete.getProductName());
-            table.addCell("Product price: " + productToDelete.getProductPrice());
-            table.addCell("Product quantity: " + productToDelete.getQty());
-            table.addCell("Product date: " + productToDelete.getDate());
-            table.addCell("Product status: " + productToDelete.getStatus());
+            table.addCell("Product code: "+productToDelete.getProductCode());
+            table.addCell("Product name: "+productToDelete.getProductName());
+            table.addCell("Product price: "+productToDelete.getProductPrice());
+            table.addCell("Product quantity: "+productToDelete.getQty());
+            table.addCell("Product date: "+productToDelete.getDate());
+            table.addCell("Product status: "+productToDelete.getStatus());
             System.out.println(table.render());
             // Remove the product from the original file
             System.out.print("Are you sure to delete (Y/N): ");
-            if (scanner.nextLine().equalsIgnoreCase("y")) {
+            if (scanner.nextLine().equalsIgnoreCase("y")){
                 productList.remove(productToDelete);
                 System.out.println("#################");
                 System.out.println("Product deleted successfully.");
@@ -205,7 +206,6 @@ public class ProductServiceImpl implements ProductService {
         int op = Integer.parseInt(scanner.nextLine());
         switch (op) {
             case 1 -> {
-                Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND);
                 System.out.print("Enter product code : ");
                 String code = scanner.nextLine();
                 for (Product product : productList) {
@@ -228,7 +228,7 @@ public class ProductServiceImpl implements ProductService {
                         updateProduct.setStatus("update");
                         updateProduct.setProductCode(product.getProductCode());
                         productList.set(productList.indexOf(product), updateProduct);
-                        fileMethods.writeTransferRecord(updateProduct, TRANSFER_FILE);
+                        fileMethods.writeTransferRecord(updateProduct,TRANSFER_FILE);
                     }
                 }
             }
@@ -310,7 +310,6 @@ public class ProductServiceImpl implements ProductService {
             default -> System.out.println("Invalid update option");
         }
     }
-
     @Override
     public void displayAllProduct(List<Product> productList, int pageNumber, int pageSize) {
         boolean isTrue;
@@ -376,7 +375,6 @@ public class ProductServiceImpl implements ProductService {
             }
         } while (isTrue);
     }
-
     @Override
     public void searchProductByName() {
         List<Product> searchProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
