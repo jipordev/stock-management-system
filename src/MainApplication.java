@@ -70,23 +70,23 @@ public class MainApplication {
 
         Thread waitForLoading = new Thread(() -> {
             try {
+                List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
+                List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
+                productList.addAll(dataSourceProducts);
+                productList.addAll(transferProducts);
+                fileMethods.checkFileForCommit(productList);
                 Thread.sleep(9);
                 Duration readFile = timeOperation(() -> {
-                    List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
-                    List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
-                    productList.addAll(dataSourceProducts);
-                    productList.addAll(transferProducts);
-                    fileMethods.checkFileForCommit(productList);
                     loadDataUntilReady(isReady);
-                    isReady.set(true);
                 });
+
+                isReady.set(true);
                 System.out.println("\n loading Completed!: " + readFile.toSeconds() + "s");
             } catch (Exception e) {
                 out.println(e.getMessage());
             }
+
         });
-
-
         waitForLoading.start();
         waitForLoading.join();
 
