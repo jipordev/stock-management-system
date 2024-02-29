@@ -2,6 +2,7 @@ package service.serviceimpl;
 
 import model.Product;
 import org.nocrala.tools.texttablefmt.BorderStyle;
+import org.nocrala.tools.texttablefmt.CellStyle;
 import org.nocrala.tools.texttablefmt.ShownBorders;
 import org.nocrala.tools.texttablefmt.Table;
 import service.FileMethods;
@@ -185,6 +186,79 @@ public class FileMethodsImpl implements FileMethods {
             }
         } else {
             System.out.println("Backup directory does not exist or is not a directory");
+        }
+    }
+    @Override
+    public void checkFileForCommit(List<Product> productList){
+        List<Product> transferProducts = readProductsFromFile("transproduct.bak");
+        if(!(transferProducts.isEmpty())){
+            System.out.print("You need to commit your record! [Yes/No] type [y/n]: ");
+            String ops = scanner.next();
+            if(ops.equalsIgnoreCase("y")){
+                List<Product> productAfterUpdate = new ArrayList<>();
+                for(Product oldProduct : productList){
+                    for(Product newProduct : transferProducts){
+                        if(newProduct.getProductCode().equals(oldProduct.getProductCode())){
+                            oldProduct.setProductCode(newProduct.getProductCode());
+                            oldProduct.setProductName(newProduct.getProductName());
+                            oldProduct.setProductPrice(newProduct.getProductPrice());
+                            oldProduct.setQty(newProduct.getQty());
+                            oldProduct.setDate(newProduct.getDate());
+                            oldProduct.setStatus(newProduct.getStatus());
+                        }
+                        else{
+                            oldProduct.setProductCode(oldProduct.getProductCode());
+                            oldProduct.setProductName(oldProduct.getProductName());
+                            oldProduct.setProductPrice(oldProduct.getProductPrice());
+                            oldProduct.setQty(oldProduct.getQty());
+                            oldProduct.setDate(oldProduct.getDate());
+                            oldProduct.setStatus(oldProduct.getStatus());
+                        }
+                    }
+                    productAfterUpdate.add(oldProduct);
+                    writeToFile(productAfterUpdate,"product.bak");
+                    clearFileTransfer("transproduct.bak");
+                    System.out.println("You chosen [Yes], You have saved your record!");
+                }
+            }else{
+                clearFileTransfer("transproduct.bak");
+                System.out.println("You chosen [NO], Last record is lost!");
+            }
+        } else {
+            System.out.println("Nothing to commit!!");
+        }
+    }
+    @Override
+    public void displayCommit(List<Product> transferProduct) {
+        transferProduct = readProductsFromFile("transproduct.bak");
+        Table table = new Table(6, BorderStyle.UNICODE_BOX_DOUBLE_BORDER_WIDE, ShownBorders.ALL);
+        Table title = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER_WIDE, ShownBorders.ALL);
+        CellStyle cellStyle = new CellStyle(CellStyle.HorizontalAlign.center);
+        title.addCell("====================================[ RECORD COMMIT ]====================================", cellStyle);
+        System.out.println(title.render());
+        table.addCell("PRODUCT CODE", cellStyle);
+        table.addCell("PRODUCT NAME", cellStyle);
+        table.addCell("PRODUCT QTY", cellStyle);
+        table.addCell("PRODUCT PRICE", cellStyle);
+        table.addCell("PRODUCT DATE", cellStyle);
+        table.addCell("PRODUCT STATUS", cellStyle);
+        for(Product productTransfer : transferProduct) {
+            table.addCell(productTransfer.getProductCode(), cellStyle);
+            table.addCell(productTransfer.getProductName(), cellStyle);
+            table.addCell(String.valueOf(productTransfer.getQty()), cellStyle);
+            table.addCell(String.valueOf(productTransfer.getProductPrice()), cellStyle);
+            table.addCell(String.valueOf(productTransfer.getDate()), cellStyle);
+            table.addCell(productTransfer.getStatus(), cellStyle);
+            System.out.println(table.render());
+        }
+    }
+    @Override
+    public void clearFileTransfer(String TRANSFER_FILE) {
+        readProductsFromFile(TRANSFER_FILE);
+        try(BufferedWriter writeToClear = new BufferedWriter(new FileWriter(TRANSFER_FILE))){
+            writeToClear.write("");
+        }catch (IOException e){
+            System.out.println("Transfer File Not Found!" + e.getMessage());
         }
     }
 }
