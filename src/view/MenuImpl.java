@@ -53,10 +53,10 @@ public class MenuImpl implements Menu{
         table.addCell("7.      Press       c : Commit transaction data");
         table.addCell("8.      Press       k : Backup data");
         table.addCell("9.      Press       t : Restore data");
-        table.addCell("10.     Press       f : Navigate pagination to the last page");
+        table.addCell("10.     Press       l : Navigate pagination to the last page");
         table.addCell("11.     Press       p : Navigate pagination to the previous page");
         table.addCell("12.     Press       n : Navigate pagination to the next page");
-        table.addCell("13.     Press       1 : Navigate pagination to the first page");
+        table.addCell("13.     Press       f : Navigate pagination to the first page");
         table.addCell("14.     Press       h : Help");
         table.addCell("15.     Press       b : Step Back of the Application");
         table.addCell("16.     Press       x : Exit the Application");
