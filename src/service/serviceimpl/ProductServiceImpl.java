@@ -115,7 +115,6 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(List<Product> productList) {
         Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND);
         // Read products from the data source file
-        productList = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
 
         System.out.print("Enter code to delete: ");
         String codeToDelete = scanner.nextLine();

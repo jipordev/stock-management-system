@@ -53,9 +53,7 @@ public class MainApplication {
     }
 
     public static void main(String[] args) {
-
         AtomicBoolean isReady = new AtomicBoolean(false);
-        loadDataUntilReady(isReady);
 
         Duration readFile = timeOperation(()->{
 
@@ -63,7 +61,8 @@ public class MainApplication {
         List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
         productList.addAll(dataSourceProducts);
         productList.addAll(transferProducts);
-
+        fileMethods.checkFileForCommit(productList);
+            loadDataUntilReady(isReady);
         });
         System.out.println("\n Completed! "+readFile.toSeconds()+"s");
         isReady.set(true);
@@ -85,7 +84,8 @@ public class MainApplication {
                 case "s" -> productService.searchProductByName();
                 case "o" -> pagination.setPageSize(scanner);
                 case "c" -> {
-                    //
+                    fileMethods.displayCommit(productList);
+                    fileMethods.checkFileForCommit(productList);
                 }
                 case "k" -> {
                     String backupFilePath = fileMethods.backupFileDir();
@@ -98,6 +98,7 @@ public class MainApplication {
                 case "t" -> fileMethods.restoreData();
                 case "h" -> menu.displayHelp();
                 case "x" -> {
+                    fileMethods.checkFileForCommit(productList);
                     System.exit(0);
                 }
             }

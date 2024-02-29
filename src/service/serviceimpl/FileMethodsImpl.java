@@ -215,19 +215,23 @@ public class FileMethodsImpl implements FileMethods {
                             oldProduct.setStatus(oldProduct.getStatus());
                         }
                     }
-                    productAfterUpdate.add(oldProduct);
+                    if (oldProduct.getStatus().equals("delete")){
+                        productAfterUpdate.remove(oldProduct);
+                    } else {
+                        productAfterUpdate.add(oldProduct);
+                    }
                     writeToFile(productAfterUpdate,"product.bak");
                     clearFileTransfer("transproduct.bak");
-                    System.out.println("You chosen [Yes], You have saved your record!");
                 }
+                System.out.println("You chosen [Yes], You have saved your record!");
             }else{
-                clearFileTransfer("transproduct.bak");
-                System.out.println("You chosen [NO], Last record is lost!");
+                System.out.println("You chosen [NO], You have not commit!");
             }
         } else {
             System.out.println("Nothing to commit!!");
         }
     }
+
     @Override
     public void displayCommit(List<Product> transferProduct) {
         transferProduct = readProductsFromFile("transproduct.bak");
