@@ -422,15 +422,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void searchProductByName() {
+    public void searchProductByName(List<Product> products) {
         try {
-            List<Product> searchProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
             System.out.print("Enter product name or part of the name to search: ");
             String searchKeyword = scanner.nextLine().trim().toLowerCase();
 
             List<Product> matchingProducts = new ArrayList<>();
 
-            for (Product product : searchProducts) {
+            for (Product product : products) {
                 if (product.getProductName().toLowerCase().contains(searchKeyword)) {
                     matchingProducts.add(product);
                 }

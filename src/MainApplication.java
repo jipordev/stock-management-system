@@ -61,8 +61,8 @@ public class MainApplication {
         productList.addAll(dataSourceProducts);
         productList.addAll(transferProducts);
         fileMethods.checkFileForCommit(productList);
-            loadDataUntilReady(isReady);
         });
+        loadDataUntilReady(isReady);
         System.out.println("\n Completed! "+readFile.toSeconds()+"s");
         isReady.set(true);
 
