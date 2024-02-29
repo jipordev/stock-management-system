@@ -54,6 +54,7 @@ public class MainApplication {
     public static void main(String[] args) {
         AtomicBoolean isReady = new AtomicBoolean(false);
 
+
         Duration readFile = timeOperation(()->{
 
         List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
@@ -61,8 +62,9 @@ public class MainApplication {
         productList.addAll(dataSourceProducts);
         productList.addAll(transferProducts);
         fileMethods.checkFileForCommit(productList);
-            loadDataUntilReady(isReady);
+
         });
+        loadDataUntilReady(isReady);
         System.out.println("\n Completed! "+readFile.toSeconds()+"s");
         isReady.set(true);
 
@@ -81,7 +83,7 @@ public class MainApplication {
                     case "r" -> productService.readProduct(productList);
                     case "e" -> productService.updateProduct(productList);
                     case "d" -> productService.deleteProduct(productList);
-                    case "s" -> productService.searchProductByName();
+                    case "s" -> productService.searchProductByName(productList);
                     case "o" -> pagination.setPageSize(scanner);
                     case "c" -> {
                         fileMethods.displayCommit(productList);

@@ -11,6 +11,6 @@ public interface ProductService {
     void readProduct(List<Product> productList);
     void updateProduct(List<Product> productList);
     void displayAllProduct(List<Product> productList, int pageNumber, int pageSize);
-    void searchProductByName();
+    void searchProductByName(List<Product> products);
 //    void loadingInMain();
 }
