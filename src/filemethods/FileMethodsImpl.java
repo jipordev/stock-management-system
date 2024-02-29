@@ -61,7 +61,7 @@ public class FileMethodsImpl implements FileMethods{
                 writer.flush();
                 writer.newLine();
             }
-            System.out.println("Data written to file successfully.");
+            //System.out.println("Data written to file successfully.");
         } catch (IOException e) {
             System.out.println("Error writing to file: " + e.getMessage());
         }
@@ -212,8 +212,8 @@ public class FileMethodsImpl implements FileMethods{
                     productAfterUpdate.add(oldProduct);
                     writeToFile(productAfterUpdate,"product.bak");
                     clearFileTransfer("transproduct.bak");
-                    System.out.println("You chosen [Yes], You have saved your record!");
                 }
+                System.out.println("You chosen [Yes], You have saved your record!");
             }else{
                 clearFileTransfer("transproduct.bak");
                 System.out.println("You chosen [NO], Last record is lost!");
