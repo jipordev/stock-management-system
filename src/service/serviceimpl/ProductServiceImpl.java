@@ -75,7 +75,7 @@ public class ProductServiceImpl implements ProductService {
                 Duration randomTime = timeOperation(() -> {
                     for (int i = 0; i < randomNumber; i++) {
                         products[i] = new Product();
-                        products[i].setProductCode("CSTAD00" + i);
+                        products[i].setProductCode("CSTAD" + i);
                         products[i].setProductName("Product::" + i);
                         products[i].setProductPrice(0.0);
                         products[i].setQty(0);
@@ -128,60 +128,55 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(List<Product> productList) {
-        try {
-            Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER,ShownBorders.SURROUND);
-            // Read products from the data source file
-            System.out.print("Enter code to delete: ");
-            String codeToDelete = scanner.nextLine();
+        Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER,ShownBorders.SURROUND);
+        // Read products from the data source file
+        System.out.print("Enter code to delete: ");
+        String codeToDelete = scanner.nextLine();
 
-            // Find the product to delete
-            Optional<Product> productToDeleteOpt = productList.stream()
-                    .filter(product -> product.getProductCode().equals(codeToDelete))
-                    .findFirst();
+        // Find the product to delete
+        Optional<Product> productToDeleteOpt = productList.stream()
+                .filter(product -> product.getProductCode().equals(codeToDelete))
+                .findFirst();
 
-            // Check if the product exists
-            if (productToDeleteOpt.isPresent()) {
-                Product productToDelete = productToDeleteOpt.get();
-                // Add the product to the transfer file with status "delete"
-                Product transferProduct = new Product(
-                        productToDelete.getProductCode(),
-                        productToDelete.getProductName(),
-                        productToDelete.getProductPrice(),
-                        productToDelete.getQty(),
-                        productToDelete.getDate(),
-                        "delete"
-                );
-                fileMethods.writeTransferRecord(transferProduct, TRANSFER_FILE);
+        // Check if the product exists1
+        if (productToDeleteOpt.isPresent()) {
+            Product productToDelete = productToDeleteOpt.get();
+            // Add the product to the transfer file with status "delete"
+            Product transferProduct = new Product(
+                    productToDelete.getProductCode(),
+                    productToDelete.getProductName(),
+                    productToDelete.getProductPrice(),
+                    productToDelete.getQty(),
+                    productToDelete.getDate(),
+                    "delete"
+            );
+            fileMethods.writeTransferRecord(transferProduct, TRANSFER_FILE);
 
-                table.addCell("Product code: "+productToDelete.getProductCode());
-                table.addCell("Product name: "+productToDelete.getProductName());
-                table.addCell("Product price: "+productToDelete.getProductPrice());
-                table.addCell("Product quantity: "+productToDelete.getQty());
-                table.addCell("Product date: "+productToDelete.getDate());
-                table.addCell("Product status: "+productToDelete.getStatus());
-                System.out.println(table.render());
-                // Remove the product from the original file
-                System.out.print("Are you sure to delete (Y/N): ");
-                if (scanner.nextLine().equalsIgnoreCase("y")){
-                    productList.remove(productToDelete);
-                    System.out.println("#################");
-                    System.out.println("Product deleted successfully.");
-                } else {
-                    System.out.println("#################");
-                    System.out.println("Deleting product canceled...");
-                }
+            table.addCell("Product code: "+productToDelete.getProductCode());
+            table.addCell("Product name: "+productToDelete.getProductName());
+            table.addCell("Product price: "+productToDelete.getProductPrice());
+            table.addCell("Product quantity: "+productToDelete.getQty());
+            table.addCell("Product date: "+productToDelete.getDate());
+            table.addCell("Product status: "+productToDelete.getStatus());
+            System.out.println(table.render());
+            // Remove the product from the original file
+            System.out.print("Are you sure to delete (Y/N): ");
+            if (scanner.nextLine().equalsIgnoreCase("y")){
+                productList.remove(productToDelete);
+                System.out.println("#################");
+                System.out.println("Product deleted successfully.");
             } else {
-                System.out.println("Product not found.");
+                System.out.println("#################");
+                System.out.println("Deleting product canceled...");
             }
-        } catch (Exception e) {
-            Message.errMessage(e.getMessage());
+        } else {
+            System.out.println("Product not found.");
         }
     }
 
     @Override
     public void readProduct(List<Product> productList) {
         try {
-            productList = fileMethods.readProductsFromFile(TRANSFER_FILE);
             Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER_WIDE, ShownBorders.SURROUND);
             System.out.print("Enter product code : ");
             String code = scanner.nextLine();
