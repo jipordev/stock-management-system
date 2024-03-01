@@ -78,29 +78,35 @@ public class FileMethodsImpl implements FileMethods {
         // Read products from the transfer file
         List<Product> transferProducts = readProductsFromFile(transferFileName);
 
-        // Iterate through the main product list
-        for (Product product : productList) {
-            // Find matching product in the transfer file
-            for (Product transferProduct : transferProducts) {
-                if (product.getProductCode().equals(transferProduct.getProductCode())) {
-                    // Update product details
-                    product.setProductName(transferProduct.getProductName());
-                    product.setProductPrice(transferProduct.getProductPrice());
-                    product.setQty(transferProduct.getQty());
-                    product.setDate(transferProduct.getDate());
-                    product.setStatus(transferProduct.getStatus());
-                    break; // Stop searching for this product in the transfer file once updated
+        // Iterate through the transfer products
+        for (Product transferProduct : transferProducts) {
+            switch (transferProduct.getStatus()) {
+                case "update" -> {
+                    // Find matching product in the main product list by product code
+                    for (Product product : productList) {
+                        if (product.getProductCode().equals(transferProduct.getProductCode())) {
+                            // Update product details
+                            product.setProductName(transferProduct.getProductName());
+                            product.setProductPrice(transferProduct.getProductPrice());
+                            product.setQty(transferProduct.getQty());
+                            product.setDate(transferProduct.getDate());
+                            product.setStatus(transferProduct.getStatus());
+                            break; // Stop searching for this product in the main list once updated
+                        }
+                    }
                 }
+                case "delete" -> productList.removeIf(product -> product.getProductCode().equals(transferProduct.getProductCode()));
+
+                default -> System.out.println("Unrecognized status: " + transferProduct.getStatus());
             }
         }
 
-        // Write the updated product list back to the main data file
+        // Write the updated product list back to the data source file
         writeToFile(productList, dataSourceFileName);
 
         // Clear the transfer file
         clearFileTransfer(transferFileName);
     }
-
 
     @Override
     public String backupFileDir() {

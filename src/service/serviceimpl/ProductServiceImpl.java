@@ -79,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
         int randomNumber = Integer.parseInt(scanner.nextLine());
         Product[] products = new Product[randomNumber];
         System.out.println("Are you sure want to random " + randomNumber + " Products?[Y/n]: ");
-        String ch = new Scanner(System.in).nextLine();
+        String ch = new Scanner(System.in).nextLine().toLowerCase();
         //loading is starting
         if (ch.equalsIgnoreCase("y")) {
             AtomicBoolean isDataReady = new AtomicBoolean(false);

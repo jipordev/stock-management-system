@@ -67,16 +67,15 @@ public class MainApplication {
 
     public static void main(String[] args) {
         List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
-        fileMethods.checkFileForCommit(transferProducts);
-        AtomicBoolean isReady = new AtomicBoolean(false);
+        List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
 
+        AtomicBoolean isReady = new AtomicBoolean(false);
         loadDataUntilReady(isReady);
 
         Thread waitForLoading = new Thread(() -> {
             try {
                 Thread.sleep(9);
                 Duration readFile = timeOperation(() -> {
-                    List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
                     productList.addAll(dataSourceProducts);
                     productList.addAll(transferProducts);
 
@@ -94,6 +93,10 @@ public class MainApplication {
             throw new RuntimeException(e);
         }
 
+        if (!transferProducts.isEmpty()){
+            fileMethods.checkFileForCommit(productList);
+        }
+
         do {
             int pageNumber = 1;
             int pageSize = pagination.setNewRow();
@@ -101,7 +104,7 @@ public class MainApplication {
             menu.displayMainMenu();
             try {
                 out.print("Choose an option: ");
-                String op = scanner.nextLine();
+                String op = scanner.nextLine().toLowerCase();
                 switch (op) {
                     case "l" -> productService.displayAllProduct(productList, pageNumber, pageSize);
                     case "m" -> productService.randomRecord(productList);
