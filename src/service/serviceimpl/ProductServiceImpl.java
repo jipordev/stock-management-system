@@ -315,7 +315,7 @@ public class ProductServiceImpl implements ProductService {
                                product.setDate(LocalDate.now());
                                product.setStatus("update");
                                fileMethods.writeTransferRecord(product, TRANSFER_FILE);
-                               System.out.println("Product name updated successfully.");
+                               System.out.println("Product price updated successfully.");
                            } else {
                                System.out.println("Update canceled.");
                            }
@@ -339,7 +339,7 @@ public class ProductServiceImpl implements ProductService {
                                product.setDate(LocalDate.now());
                                product.setStatus("update");
                                fileMethods.writeTransferRecord(product, TRANSFER_FILE);
-                               System.out.println("Product name updated successfully.");
+                               System.out.println("Product qty updated successfully.");
                            } else {
                                System.out.println("Update canceled.");
                            }

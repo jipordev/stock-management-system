@@ -3,6 +3,7 @@ import service.serviceimpl.FileMethodsImpl;
 import model.Product;
 import service.ProductService;
 import service.serviceimpl.ProductServiceImpl;
+import util.Message;
 import util.Pagination;
 import util.PaginationImpl;
 import util.exception.StringRegex;
@@ -48,7 +49,7 @@ public class MainApplication {
                     i++;
                 }
             } catch (Exception e) {
-                e.getMessage();
+                Message.errMessage(e.getMessage());
             }
         }).start();
     }
@@ -94,6 +95,7 @@ public class MainApplication {
         }
 
         if (!transferProducts.isEmpty()){
+            fileMethods.displayCommit(productList);
             fileMethods.checkFileForCommit(productList);
         }
 

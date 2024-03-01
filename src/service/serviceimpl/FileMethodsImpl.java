@@ -16,10 +16,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class FileMethodsImpl implements FileMethods {
     static Table table = new Table(1, BorderStyle.UNICODE_BOX_DOUBLE_BORDER, ShownBorders.SURROUND);
@@ -57,16 +54,29 @@ public class FileMethodsImpl implements FileMethods {
     @Override
     public void writeToFile(List<Product> productList, String fileName) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            for (Product p : productList) {
-                writer.write(p.getProductCode() + "," +
-                        p.getProductName() + "," +
-                        p.getProductPrice() + "," +
-                        p.getQty() + "," +
-                        p.getDate().toString() + "," +
-                        p.getStatus());
-                writer.flush();
-                writer.newLine();
-            }
+            // Create a set to store unique product codes
+            Set<String> writtenProductCodes = new HashSet<>();
+
+            // Stream the productList
+            productList.stream()
+                    // Filter out products with product codes that have already been written
+                    .filter(p -> writtenProductCodes.add(p.getProductCode()))
+                    // Write the product details to the file
+                    .forEach(p -> {
+                        try {
+                            writer.write(p.getProductCode() + "," +
+                                    p.getProductName() + "," +
+                                    p.getProductPrice() + "," +
+                                    p.getQty() + "," +
+                                    p.getDate().toString() + "," +
+                                    p.getStatus());
+                            writer.flush();
+                            writer.newLine();
+                        } catch (IOException e) {
+                            Message.errMessage("Error writing to file: " + e.getMessage());
+                        }
+                    });
+
             System.out.println("\nData written to file successfully.");
         } catch (IOException e) {
             Message.errMessage("Error writing to file: " + e.getMessage());
@@ -78,30 +88,31 @@ public class FileMethodsImpl implements FileMethods {
         // Read products from the transfer file
         List<Product> transferProducts = readProductsFromFile(transferFileName);
 
-        // Iterate through the transfer products
-        for (Product transferProduct : transferProducts) {
-            switch (transferProduct.getStatus()) {
-                case "update" -> {
-                    // Find matching product in the main product list by product code
-                    for (Product product : productList) {
-                        if (product.getProductCode().equals(transferProduct.getProductCode())) {
-                            // Update product details
-                            product.setProductName(transferProduct.getProductName());
-                            product.setProductPrice(transferProduct.getProductPrice());
-                            product.setQty(transferProduct.getQty());
-                            product.setDate(transferProduct.getDate());
-                            product.setStatus(transferProduct.getStatus());
-                            break; // Stop searching for this product in the main list once updated
-                        }
-                    }
-                }
-                case "delete" -> productList.removeIf(product -> product.getProductCode().equals(transferProduct.getProductCode()));
+        // Keep track of product codes that have been updated
+        Set<String> updatedProductCodes = new HashSet<>();
 
-                default -> System.out.println("Unrecognized status: " + transferProduct.getStatus());
+        // Iterate through the main product list
+        for (Product product : productList) {
+            // Find matching product in the transfer file
+            for (Product transferProduct : transferProducts) {
+                if (product.getProductCode().equals(transferProduct.getProductCode()) &&
+                        !updatedProductCodes.contains(product.getProductCode())) { // Check if the product code hasn't been updated yet
+                    // Update product details
+                    product.setProductName(transferProduct.getProductName());
+                    product.setProductPrice(transferProduct.getProductPrice());
+                    product.setQty(transferProduct.getQty());
+                    product.setDate(transferProduct.getDate());
+                    product.setStatus(transferProduct.getStatus());
+
+                    // Add the product code to the set of updated product codes
+                    updatedProductCodes.add(product.getProductCode());
+
+                    break; // Stop searching for this product in the transfer file once updated
+                }
             }
         }
 
-        // Write the updated product list back to the data source file
+        // Write the updated product list back to the main data file
         writeToFile(productList, dataSourceFileName);
 
         // Clear the transfer file

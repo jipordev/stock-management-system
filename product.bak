@@ -1,5 +1,5 @@
-CSTAD0,cc,0.0,0,2024-03-01,update
-CSTAD1,y,0.0,0,2024-03-01,update
+CSTAD0,Product::0,0.0,0,2024-03-01,null
+CSTAD1,Product::1,0.0,0,2024-03-01,null
 CSTAD2,Product::2,0.0,0,2024-03-01,null
 CSTAD3,Product::3,0.0,0,2024-03-01,null
 CSTAD4,Product::4,0.0,0,2024-03-01,null
@@ -98,5 +98,4 @@ CSTAD96,Product::96,0.0,0,2024-03-01,null
 CSTAD97,Product::97,0.0,0,2024-03-01,null
 CSTAD98,Product::98,0.0,0,2024-03-01,null
 CSTAD99,Product::99,0.0,0,2024-03-01,null
-CSTAD0,cc,0.0,0,2024-03-01,update
-CSTAD1,y,0.0,0,2024-03-01,update
+cc,fanta,4.0,4,2024-03-01,update
