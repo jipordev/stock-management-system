@@ -80,6 +80,8 @@ public class FileMethodsImpl implements FileMethods {
             System.out.println("\nData written to file successfully.");
         } catch (IOException e) {
             Message.errMessage("Error writing to file: " + e.getMessage());
+        } catch (OutOfMemoryError e) {
+            Message.errMessage(e.getMessage());
         }
     }
 

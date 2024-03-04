@@ -104,8 +104,10 @@ public class ProductServiceImpl implements ProductService {
                     isDataReady.set(true);
                 });
                 System.out.println("Write " + randomNumber + " Products Speed : " + randomTime.toSeconds() + " s");
-            } catch (InterruptedException e) {
-                Message.errMessage(e.getMessage());
+            } catch (InterruptedException | OutOfMemoryError e) {
+                Message.errMessage("This is error message: "+e.getMessage());
+            } finally {
+                System.out.println("Error at random");
             }
         }
     }

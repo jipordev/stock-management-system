@@ -68,8 +68,6 @@ public class MainApplication {
 
     public static void main(String[] args) {
         List<Product> transferProducts = fileMethods.readProductsFromFile(TRANSFER_FILE);
-        List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
-
         AtomicBoolean isReady = new AtomicBoolean(false);
         loadDataUntilReady(isReady);
 
@@ -77,12 +75,17 @@ public class MainApplication {
             try {
                 Thread.sleep(9);
                 Duration readFile = timeOperation(() -> {
+                    List<Product> dataSourceProducts = fileMethods.readProductsFromFile(DATA_SOURCE_FILE);
                     productList.addAll(dataSourceProducts);
                     productList.addAll(transferProducts);
+                    if (!transferProducts.isEmpty()){
+                        fileMethods.displayCommit(productList);
+                        fileMethods.checkFileForCommit(productList);
+                    }
 
                 });
                 isReady.set(true);
-                System.out.println("\n loading Completed!: " + readFile.toSeconds() + "s");
+                System.out.println("\nloading Completed!: " + readFile.toSeconds() + "s");
             } catch (Exception e) {
                 out.println(e.getMessage());
             }
@@ -94,10 +97,6 @@ public class MainApplication {
             throw new RuntimeException(e);
         }
 
-        if (!transferProducts.isEmpty()){
-            fileMethods.displayCommit(productList);
-            fileMethods.checkFileForCommit(productList);
-        }
 
         do {
             int pageNumber = 1;
